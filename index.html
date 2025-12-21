@@ -936,6 +936,10 @@
         <div class="header-toggle" id="privacyToggle" title="Camcookie-only shield">
           <div class="header-toggle-*****"></div>
         </div>
+        <div class="header-pill" id="newCamcookieTabBtn" style="cursor:pointer;">
+  <span>Camcookie</span>
+  <span class="key">Tab</span>
+</div>
         <div class="header-pill" id="installBtn" style="cursor:pointer;">
   <span>Install</span>
   <span class="key">PWA</span>
@@ -1046,11 +1050,19 @@
     </div>
   </div>
   <script>
+document.getElementById("newCamcookieTabBtn").addEventListener("click", () => {
+  // Create a new tab that loads your main site
+  createTab({
+    url: "https://camcookie876.github.io/",
+    title: "Camcookie Home"
+  });
+
+  // Focus the address bar for convenience
+  addressInput.focus();
+});
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-<script>
+};
 let deferredPrompt;
 
 // Listen for the browser saying “this can be installed”
@@ -1079,8 +1091,6 @@ window.addEventListener("appinstalled", () => {
   const installBtn = document.getElementById("installBtn");
   installBtn.style.display = "none";
 });
-</script>
-  <script>
     // --------------------------
     // Core state
     // --------------------------
