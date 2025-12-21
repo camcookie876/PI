@@ -936,6 +936,10 @@
         <div class="header-toggle" id="privacyToggle" title="Camcookie-only shield">
           <div class="header-toggle-*****"></div>
         </div>
+        <div class="header-pill" id="installBtn" style="display:none; cursor:pointer;">
+  <span>Install</span>
+  <span class="key">PWA</span>
+</div>
       </div>
     </div>
 
@@ -943,21 +947,6 @@
     <div class="tabs-bar" id="tabsBar">
       <!-- Tabs dynamically injected here -->
       <div class="tab-new" id="newTabBtn" title="New tab (Ctrl+T)">+</div>
-      <button id="installBtn" style="
-  display:none;
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  padding:12px 18px;
-  border-radius:12px;
-  background:#ffb347;
-  color:#2c1800;
-  border:none;
-  font-weight:600;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
-">
-  Install Camcookie Browser
-</button>
     </div>
 
     <!-- Toolbar / URL bar -->
@@ -1064,30 +1053,27 @@ if ("serviceWorker" in navigator) {
 <script>
 let deferredPrompt;
 
-// Detect the install prompt event
+// Listen for the browser saying “this can be installed”
 window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();            // Stop Chrome from auto‑showing the banner
-  deferredPrompt = e;            // Save the event for later
+  e.preventDefault();          // Stop automatic mini-infobar
+  deferredPrompt = e;          // Save the event for later
 
-  // Show your custom install UI
+  // Show the header install button
   const installBtn = document.getElementById("installBtn");
-  installBtn.style.display = "block";
+  installBtn.style.display = "flex";
 
-  installBtn.addEventListener("click", async () => {
-    installBtn.style.display = "none";
-
-    // Show the real browser install prompt
-    deferredPrompt.prompt();
+  installBtn.onclick = async () => {
+    installBtn.style.display = "none";   // Hide button after click
+    deferredPrompt.prompt();             // Show real install prompt
 
     const result = await deferredPrompt.userChoice;
-
     console.log("Install result:", result.outcome);
 
     deferredPrompt = null;
-  });
+  };
 });
 
-// Detect if already installed
+// Hide button if already installed
 window.addEventListener("appinstalled", () => {
   console.log("Camcookie Browser installed!");
   const installBtn = document.getElementById("installBtn");
