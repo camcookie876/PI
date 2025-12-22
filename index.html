@@ -1050,6 +1050,26 @@
     </div>
   </div>
   <script>
+const allowedOrigins = [
+  "https://camcookie876.github.io",
+  "https://camcookieb.github.io",
+  "https://camcookieg.github.io",
+  "https://camcookiea.github.io",
+  "https://camcookiem.github.io"
+];
+
+window.addEventListener("message", (event) => {
+  if (!allowedOrigins.includes(event.origin)) return;
+
+  const data = event.data;
+
+  if (data.type === "camcookie-open-tab") {
+    createTab({
+      url: data.url,
+      title: data.title || "Camcookie Site"
+    });
+  }
+});
 document.getElementById("newCamcookieTabBtn").addEventListener("click", () => {
   // Create a new tab that loads your main site
   createTab({
