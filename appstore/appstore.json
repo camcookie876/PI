@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "id": "camcookieappstore",
+      "name": "Camcookie App Store",
+      "creator": "Camcookie INC",
+      "description": "A cool app.",
+      "icon": "https://camcookie876.github.io/app/appstore/icons/myapp.png",
+      "install": [
+        "curl -sSL https://camcookie876.github.io/install-appstore.sh | bash"
+      ],
+      "launch": "python3 $HOME/camcookie-appstore.py",
+      "version": "1.0",
+      "files": []
+    }
+  ]
+}
