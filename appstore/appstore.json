@@ -32,7 +32,7 @@
     "wget https://camcookie876.github.io/app/appstore/apps/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
     "chmod +x $HOME/camcookie-actions/camcookie_actions.py"
   ],
-  "launch": "cd $HOME/camcookie-actions && source venv/bin/activate && python3 camcookie_actions.py",
+  "launch": "$HOME/camcookie-actions/venv/bin/python3 $HOME/camcookie-actions/camcookie_actions.py",
   "version": "1.0",
   "files": []
 }
