@@ -1,40 +1,48 @@
 {
   "apps": [
-{
-  "id": "camcookieappstore",
-  "name": "Camcookie App Store",
-  "creator": "Camcookie INC",
-  "description": "The Camcookie Appstore",
-  "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieappstore.png",
-  "install": [
-    "curl -sSL https://camcookie876.github.io/app/appstore/install-appstore.sh | bash"
-  ],
-  "launch": "python3 $HOME/camcookie-appstore.py",
-  "version": "1.2",
-  "files": []
-},
     {
-  "id": "camcookieactions",
-  "name": "Camcookie Actions",
-  "creator": "Camcookie INC",
-  "description": "Offline voice assistant for Raspberry Pi OS. Uses Vosk, pyttsx3, and PyAutoGUI for real offline control. More infromation at https://github.com/camcookie876/PY-M/tree/main/camcookie-for-pi/actions#-camcookie-actions",
-  "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieactions.png",
-  "install": [
-    "sudo apt update && sudo apt full-upgrade -y",
-    "sudo apt install -y python3-full python3-venv python3-pip portaudio19-dev ffmpeg scrot unzip wget espeak-ng",
-    "mkdir -p $HOME/camcookie-actions",
-    "cd $HOME/camcookie-actions && python3 -m venv venv",
-    "$HOME/camcookie-actions/venv/bin/pip install vosk pyttsx3 pyautogui speechrecognition pyaudio",
-    "mkdir -p $HOME/camcookie-actions/models",
-    "cd $HOME/camcookie-actions/models && wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
-    "cd $HOME/camcookie-actions/models && unzip -o vosk-model-small-en-us-0.15.zip",
-    "wget https://camcookie876.github.io/app/appstore/apps/camcookieactions/actions.json -O $HOME/camcookie-actions/actions.json",
-    "wget https://camcookie876.github.io/app/appstore/apps/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
-    "chmod +x $HOME/camcookie-actions/camcookie_actions.py"
-  ],
-  "launch": "$HOME/camcookie-actions/venv/bin/python3 $HOME/camcookie-actions/camcookie_actions.py",
-  "version": "1.0",
-  "files": []
-}
+      "id": "camcookieappstore",
+      "name": "Camcookie App Store",
+      "creator": "Camcookie INC",
+      "description": "The Camcookie Appstore",
+      "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieappstore.png",
+      "install": [
+        "curl -sSL https://camcookie876.github.io/app/appstore/install-appstore.sh | bash"
+      ],
+      "uninstall": [
+        "rm -f $HOME/camcookie-appstore.py",
+        "rm -f $HOME/.local/share/applications/camcookie-appstore.desktop",
+        "rm -f $HOME/.camcookie_installed.json"
+      ],
+      "launch": "python3 $HOME/camcookie-appstore.py",
+      "version": "1.3",
+      "files": []
+    },
+    {
+      "id": "camcookieactions",
+      "name": "Camcookie Actions",
+      "creator": "Camcookie INC",
+      "description": "Offline voice assistant for Raspberry Pi OS. Uses Vosk, pyttsx3, and PyAutoGUI for real offline control. More infromation at https://github.com/camcookie876/PY-M/tree/main/camcookie-for-pi/actions#-camcookie-actions",
+      "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieactions.png",
+      "install": [
+        "sudo apt update && sudo apt full-upgrade -y",
+        "sudo apt install -y python3-full python3-venv python3-pip portaudio19-dev ffmpeg scrot unzip wget espeak-ng",
+        "mkdir -p $HOME/camcookie-actions",
+        "cd $HOME/camcookie-actions && python3 -m venv venv",
+        "$HOME/camcookie-actions/venv/bin/pip install vosk pyttsx3 pyautogui speechrecognition pyaudio",
+        "mkdir -p $HOME/camcookie-actions/models",
+        "cd $HOME/camcookie-actions/models && wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
+        "cd $HOME/camcookie-actions/models && unzip -o vosk-model-small-en-us-0.15.zip",
+        "wget https://camcookie876.github.io/app/appstore/apps/camcookieactions/actions.json -O $HOME/camcookie-actions/actions.json",
+        "wget https://camcookie876.github.io/app/appstore/apps/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
+        "chmod +x $HOME/camcookie-actions/camcookie_actions.py"
+      ],
+      "uninstall": [
+        "rm -rf $HOME/camcookie-actions"
+      ],
+      "launch": "$HOME/camcookie-actions/venv/bin/python3 $HOME/camcookie-actions/camcookie_actions.py",
+      "version": "1.0",
+      "files": []
+    }
   ]
 }
