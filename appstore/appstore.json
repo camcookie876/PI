@@ -45,30 +45,29 @@
       "files": []
     },
 {
-  "id": "htmlmaker",
-  "name": "HTML Maker",
+  "id": "pythonmaker",
+  "name": "Python Maker",
   "creator": "Camcookie INC",
-  "description": "A simple Raspberry Pi HTML editor with live preview. Runs as a standalone Python app using Tkinter.",
-  "icon": "https://camcookie876.github.io/app/appstore/icons/htmlmaker.png",
+  "description": "A simple Raspberry Pi Python editor and runner. Write Python code, run it, and see output instantly.",
+  "icon": "https://camcookie876.github.io/app/appstore/icons/pythonmaker.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk",
-    "pip3 install tkhtmlview",
-    "mkdir -p $HOME/htmlmaker",
-    "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/htmlmaker.py -O $HOME/htmlmaker/htmlmaker.py",
-    "chmod +x $HOME/htmlmaker/htmlmaker.py",
-    "echo '[Desktop Entry]' > $HOME/.local/share/applications/htmlmaker.desktop",
-    "echo 'Type=Application' >> $HOME/.local/share/applications/htmlmaker.desktop",
-    "echo 'Name=HTML Maker' >> $HOME/.local/share/applications/htmlmaker.desktop",
-    "echo 'Exec=python3 $HOME/htmlmaker/htmlmaker.py' >> $HOME/.local/share/applications/htmlmaker.desktop",
-    "echo 'Terminal=false' >> $HOME/.local/share/applications/htmlmaker.desktop",
-    "echo 'Categories=Development;' >> $HOME/.local/share/applications/htmlmaker.desktop"
+    "mkdir -p $HOME/pythonmaker",
+    "wget https://camcookie876.github.io/app/appstore/apps/pythonmaker/pythonmaker.py -O $HOME/pythonmaker/pythonmaker.py",
+    "chmod +x $HOME/pythonmaker/pythonmaker.py",
+    "echo '[Desktop Entry]' > $HOME/.local/share/applications/pythonmaker.desktop",
+    "echo 'Type=Application' >> $HOME/.local/share/applications/pythonmaker.desktop",
+    "echo 'Name=Python Maker' >> $HOME/.local/share/applications/pythonmaker.desktop",
+    "echo 'Exec=python3 $HOME/pythonmaker/pythonmaker.py' >> $HOME/.local/share/applications/pythonmaker.desktop",
+    "echo 'Terminal=false' >> $HOME/.local/share/applications/pythonmaker.desktop",
+    "echo 'Categories=Development;' >> $HOME/.local/share/applications/pythonmaker.desktop"
   ],
   "uninstall": [
-    "rm -rf $HOME/htmlmaker",
-    "rm -f $HOME/.local/share/applications/htmlmaker.desktop"
+    "rm -rf $HOME/pythonmaker",
+    "rm -f $HOME/.local/share/applications/pythonmaker.desktop"
   ],
-  "launch": "python3 $HOME/htmlmaker/htmlmaker.py",
+  "launch": "python3 $HOME/pythonmaker/pythonmaker.py",
   "version": "1.0",
   "files": []
 }
