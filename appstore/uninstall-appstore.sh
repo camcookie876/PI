@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Uninstalling Camcookie Appstore..."
+echo "Uninstalling Camcookie Appstore V10..."
 
 HOME_DIR="$HOME"
 
@@ -22,8 +22,13 @@ if [ -f "$HOME_DIR/.camcookie_installed.json" ]; then
     echo "Removed installed versions database."
 fi
 
+# Remove icon cache folder
+if [ -d "$HOME_DIR/.camcookie/icons" ]; then
+    rm -r "$HOME_DIR/.camcookie/icons"
+    echo "Removed icon cache."
+fi
+
 # Refresh menu
 update-desktop-database "$HOME_DIR/.local/share/applications" >/dev/null 2>&1
 
-echo "Camcookie Appstore has been fully uninstalled."
-echo "All files and menu entries have been removed."
+echo "Camcookie Appstore V10 has been fully uninstalled."
