@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Uninstalling Camcookie Appstore V10..."
+echo "Uninstalling Camcookie Appstore"
 
 HOME_DIR="$HOME"
 
@@ -31,4 +31,4 @@ fi
 # Refresh menu
 update-desktop-database "$HOME_DIR/.local/share/applications" >/dev/null 2>&1
 
-echo "Camcookie Appstore V10 has been fully uninstalled."
+echo "Camcookie Appstore has been fully uninstalled."
