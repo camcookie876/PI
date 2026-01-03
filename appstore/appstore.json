@@ -15,7 +15,7 @@
         "rm -f $HOME/.camcookie_installed.json"
       ],
       "launch": "python3 $HOME/camcookie-appstore.py",
-      "version": "1.3",
+      "version": "1.4",
       "files": []
     },
     {
