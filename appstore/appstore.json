@@ -48,23 +48,22 @@
   "id": "htmlmaker",
   "name": "HTML Maker",
   "creator": "Camcookie INC",
-  "description": "A simple Raspberry Pi HTML editor with live preview. Build and test HTML pages directly on your Pi.",
+  "description": "A simple Raspberry Pi HTML editor with live preview. Runs as a standalone Python app using Tkinter.",
   "icon": "https://camcookie876.github.io/app/appstore/icons/htmlmaker.png",
-"install": [
-  "sudo apt update",
-  "sudo apt install -y python3 python3-pip",
-  "pip3 install flask pywebview",
-  "mkdir -p $HOME/htmlmaker",
-  "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/htmlmaker.py -O $HOME/htmlmaker/htmlmaker.py",
-  "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/editor.html -O $HOME/htmlmaker/editor.html",
-  "chmod +x $HOME/htmlmaker/htmlmaker.py",
-  "echo '[Desktop Entry]' > $HOME/.local/share/applications/htmlmaker.desktop",
-  "echo 'Type=Application' >> $HOME/.local/share/applications/htmlmaker.desktop",
-  "echo 'Name=HTML Maker' >> $HOME/.local/share/applications/htmlmaker.desktop",
-  "echo 'Exec=python3 $HOME/htmlmaker/htmlmaker.py' >> $HOME/.local/share/applications/htmlmaker.desktop",
-  "echo 'Terminal=true' >> $HOME/.local/share/applications/htmlmaker.desktop",
-  "echo 'Categories=Development;' >> $HOME/.local/share/applications/htmlmaker.desktop"
-],
+  "install": [
+    "sudo apt update",
+    "sudo apt install -y python3 python3-pip python3-tk",
+    "pip3 install tkhtmlview",
+    "mkdir -p $HOME/htmlmaker",
+    "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/htmlmaker.py -O $HOME/htmlmaker/htmlmaker.py",
+    "chmod +x $HOME/htmlmaker/htmlmaker.py",
+    "echo '[Desktop Entry]' > $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Type=Application' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Name=HTML Maker' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Exec=python3 $HOME/htmlmaker/htmlmaker.py' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Terminal=false' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Categories=Development;' >> $HOME/.local/share/applications/htmlmaker.desktop"
+  ],
   "uninstall": [
     "rm -rf $HOME/htmlmaker",
     "rm -f $HOME/.local/share/applications/htmlmaker.desktop"
