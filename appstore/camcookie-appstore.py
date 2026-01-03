@@ -31,10 +31,9 @@ icon_cache_images = {}
 
 DEFAULT_SETTINGS = {
     "theme": "soft_blue",       # soft_blue, light, dark
-    "tile_bg_color": "#1f3b5b", # soft tile
+    "tile_bg_color": "#1f3b5b",
     "background_color": "#0b1220",
-    "background_mode": "color", # reserved
-    "startup_tab": "Home"       # Home, All, Installed, Updates, Settings
+    "startup_tab": "Home"       # Home, All Apps, Installed, Updates, Settings
 }
 
 def load_settings():
@@ -54,6 +53,15 @@ def save_settings(settings):
         json.dump(settings, f, indent=2)
 
 settings = load_settings()
+
+def get_safe_color(value, fallback):
+    if not isinstance(value, str):
+        return fallback
+    if not value.startswith("#"):
+        return fallback
+    if len(value) not in (4, 7):
+        return fallback
+    return value
 
 # =========================
 # Installed versions DB
@@ -131,7 +139,6 @@ def load_icon_image(app):
         return None
 
 def clear_icon_cache_for_app(app_id):
-    # Remove cached image from memory and disk
     if app_id in icon_cache_images:
         del icon_cache_images[app_id]
     for fname in os.listdir(ICON_CACHE_DIR):
@@ -198,9 +205,9 @@ def uninstall_app(app):
         uninstall_cmds = app.get("uninstall", [])
         if uninstall_cmds:
             run_commands(uninstall_cmds, "Uninstall")
-        # Drop from DB
-        del local_versions[app_id]
-        save_local_versions(local_versions)
+        if app_id in local_versions:
+            del local_versions[app_id]
+            save_local_versions(local_versions)
         clear_icon_cache_for_app(app_id)
         messagebox.showinfo("Uninstalled", f"{app['name']} was uninstalled.")
         refresh_all_views()
@@ -321,57 +328,35 @@ def make_linked_label(parent, text, fg="white", bg=None):
     return frame
 
 # =========================
-# Theme
+# Theme (pure tk, no ttk bg hacks)
 # =========================
 
-TILE_BG = settings.get("tile_bg_color", "#1f3b5b")
-
-def apply_theme(root):
-    global TILE_BG
+def get_theme_colors():
     theme = settings.get("theme", "soft_blue")
-    TILE_BG = settings.get("tile_bg_color", "#1f3b5b")
-    bg_color = settings.get("background_color", "#0b1220")
+    bg = get_safe_color(settings.get("background_color"), "#0b1220")
+    tile = get_safe_color(settings.get("tile_bg_color"), "#1f3b5b")
 
     if theme == "light":
-        root.configure(bg="#f0f0f0")
+        return {
+            "bg": "#f5f5f5",
+            "fg_main": "#111827",
+            "fg_sub": "#4b5563",
+            "tile": "#e5e7eb"
+        }
     elif theme == "dark":
-        root.configure(bg="#050816")
+        return {
+            "bg": "#050816",
+            "fg_main": "#e5e7eb",
+            "fg_sub": "#9ca3af",
+            "tile": tile
+        }
     else:  # soft_blue
-        root.configure(bg=bg_color)
-
-    style = ttk.Style()
-    style.theme_use("clam")
-
-    if theme == "light":
-        style.configure("Main.TFrame", background="#f0f0f0")
-        style.configure("Nav.TFrame", background="#e4e4e4")
-        style.configure("Nav.TButton",
-                        background="#d0d0d0",
-                        foreground="#000000",
-                        padding=(12, 6))
-        style.map("Nav.TButton",
-                  background=[("active", "#c0c0c0")])
-    elif theme == "dark":
-        style.configure("Main.TFrame", background="#050816")
-        style.configure("Nav.TFrame", background="#111827")
-        style.configure("Nav.TButton",
-                        background="#1f2937",
-                        foreground="#ffffff",
-                        padding=(12, 6))
-        style.map("Nav.TButton",
-                  background=[("active", "#374151")])
-    else:  # soft_blue
-        style.configure("Main.TFrame", background=bg_color)
-        style.configure("Nav.TFrame", background="#020617")
-        style.configure("Nav.TButton",
-                        background="#020617",
-                        foreground="#e5e7eb",
-                        padding=(12, 6))
-        style.map("Nav.TButton",
-                  background=[("active", "#0f172a")])
-
-    style.configure("TLabel", background=style.lookup("Main.TFrame", "background"),
-                    foreground="#e5e7eb" if theme != "light" else "#000000")
+        return {
+            "bg": bg,
+            "fg_main": "#e5e7eb",
+            "fg_sub": "#9ca3af",
+            "tile": tile
+        }
 
 # =========================
 # UI helpers
@@ -382,25 +367,18 @@ def clear_frame(frame):
         w.destroy()
 
 # =========================
-# App card + details
+# App details window
 # =========================
 
 def open_app_details(app):
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg = colors["fg_main"]
+    subfg = colors["fg_sub"]
+
     details = tk.Toplevel(root)
     details.title(app.get("name", "App details"))
     details.geometry("600x500")
-    details.configure(bg="#020617")
-
-    theme = settings.get("theme", "soft_blue")
-    if theme == "light":
-        fg = "#000000"
-        bg = "#f9fafb"
-        subfg = "#4b5563"
-    else:
-        fg = "#e5e7eb"
-        bg = "#020617"
-        subfg = "#9ca3af"
-
     details.configure(bg=bg)
 
     header = tk.Frame(details, bg=bg)
@@ -461,7 +439,16 @@ def open_app_details(app):
 
     ttk.Button(btn_row, text="Close", command=details.destroy).pack(side="right", padx=4)
 
+# =========================
+# App card
+# =========================
+
 def build_app_card(parent, app, compact=False):
+    colors = get_theme_colors()
+    tile_bg = colors["tile"]
+    fg_main = "#ffffff"
+    fg_sub = "#d1d5db"
+
     app_id = app["id"]
     name = app.get("name", app_id)
     creator = app.get("creator", "Unknown creator")
@@ -469,18 +456,18 @@ def build_app_card(parent, app, compact=False):
     remote_version = app.get("version", "0.0")
     local_version = local_versions.get(app_id)
 
-    card = tk.Frame(parent, bd=0, bg=TILE_BG, highlightthickness=0)
+    card = tk.Frame(parent, bd=0, bg=parent.cget("bg"), highlightthickness=0)
     card.pack(fill="x", pady=8, padx=10)
 
-    inner = tk.Frame(card, bg=TILE_BG)
+    inner = tk.Frame(card, bg=tile_bg)
     inner.pack(fill="both", expand=True, padx=8, pady=8)
 
-    top_frame = tk.Frame(inner, bg=TILE_BG)
+    top_frame = tk.Frame(inner, bg=tile_bg)
     top_frame.pack(fill="x")
 
     icon_img = load_icon_image(app)
     if icon_img is not None:
-        icon_label = tk.Label(top_frame, image=icon_img, bg=TILE_BG)
+        icon_label = tk.Label(top_frame, image=icon_img, bg=tile_bg)
         icon_label.image = icon_img
         icon_label.pack(side="left", padx=(0, 10))
     else:
@@ -489,25 +476,25 @@ def build_app_card(parent, app, compact=False):
             text="🟦",
             font=("Arial", 20),
             width=2,
-            bg=TILE_BG,
+            bg=tile_bg,
             fg="white"
         )
         placeholder.pack(side="left", padx=(0, 10))
 
-    text_frame = tk.Frame(top_frame, bg=TILE_BG)
+    text_frame = tk.Frame(top_frame, bg=tile_bg)
     text_frame.pack(side="left", fill="x", expand=True)
 
     name_label = tk.Label(text_frame, text=name,
-                          font=("Arial", 14, "bold"), bg=TILE_BG, fg="white")
+                          font=("Arial", 14, "bold"), bg=tile_bg, fg=fg_main)
     name_label.pack(anchor="w")
 
     creator_label = tk.Label(text_frame, text=f"by {creator}",
                              font=("Arial", 10, "italic"),
-                             bg=TILE_BG, fg="#d1d5db")
+                             bg=tile_bg, fg=fg_sub)
     creator_label.pack(anchor="w")
 
     if not compact:
-        make_linked_label(inner, description, fg="#e5e7eb", bg=TILE_BG)
+        make_linked_label(inner, description, fg=fg_main, bg=tile_bg)
 
     version_text = ""
     if local_version:
@@ -519,10 +506,10 @@ def build_app_card(parent, app, compact=False):
         version_text = f"Available: {remote_version}"
 
     version_label = tk.Label(inner, text=version_text,
-                             font=("Arial", 9), bg=TILE_BG, fg="#d1d5db")
+                             font=("Arial", 9), bg=tile_bg, fg=fg_sub)
     version_label.pack(anchor="w")
 
-    btn_frame = tk.Frame(inner, bg=TILE_BG)
+    btn_frame = tk.Frame(inner, bg=tile_bg)
     btn_frame.pack(anchor="e", pady=(6, 0))
 
     ttk.Button(
@@ -557,16 +544,22 @@ def build_app_card(parent, app, compact=False):
     ).pack(side="left", padx=4)
 
 # =========================
-# Views (tabs via top nav)
+# Views
 # =========================
 
 def populate_home():
     clear_frame(home_frame)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_main = colors["fg_main"]
+    fg_sub = colors["fg_sub"]
+    home_frame.configure(bg=bg)
+
     title = tk.Label(
         home_frame, text="Welcome to Camcookie Appstore",
         font=("Arial", 18, "bold"),
-        bg=home_frame.cget("bg"),
-        fg="#e5e7eb" if settings.get("theme") != "light" else "#111827"
+        bg=bg,
+        fg=fg_main
     )
     title.pack(anchor="w", padx=20, pady=(20, 5))
 
@@ -574,20 +567,19 @@ def populate_home():
         home_frame,
         text="Featured apps, recent updates, and tools built for Camcookie OS.",
         font=("Arial", 11),
-        bg=home_frame.cget("bg"),
-        fg="#9ca3af" if settings.get("theme") != "light" else "#4b5563"
+        bg=bg,
+        fg=fg_sub
     )
     subtitle.pack(anchor="w", padx=20, pady=(0, 15))
 
-    # Featured: first few apps
     if all_apps:
-        tk.Label(
+        section_label = tk.Label(
             home_frame, text="Featured Apps", font=("Arial", 13, "bold"),
-            bg=home_frame.cget("bg"),
-            fg="#e5e7eb" if settings.get("theme") != "light" else "#111827"
-        ).pack(anchor="w", padx=20, pady=(5, 5))
+            bg=bg, fg=fg_main
+        )
+        section_label.pack(anchor="w", padx=20, pady=(5, 5))
 
-        featured_frame = tk.Frame(home_frame, bg=home_frame.cget("bg"))
+        featured_frame = tk.Frame(home_frame, bg=bg)
         featured_frame.pack(fill="x", padx=10)
         count = 0
         for app in all_apps:
@@ -598,6 +590,11 @@ def populate_home():
 
 def populate_all_apps():
     clear_frame(all_apps_inner)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    all_apps_inner.configure(bg=bg)
+    all_canvas.configure(bg=bg)
+
     search_term = all_search_var.get().strip().lower()
     for app in all_apps:
         if search_term:
@@ -614,6 +611,12 @@ def populate_all_apps():
 
 def populate_installed():
     clear_frame(installed_inner)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_sub = colors["fg_sub"]
+    installed_inner.configure(bg=bg)
+    inst_canvas.configure(bg=bg)
+
     any_installed = False
     for app in all_apps:
         app_id = app["id"]
@@ -625,12 +628,18 @@ def populate_installed():
             installed_inner,
             text="No apps installed yet. Go to All Apps to install something!",
             font=("Arial", 11),
-            bg=installed_inner.cget("bg"),
-            fg="#9ca3af" if settings.get("theme") != "light" else "#4b5563"
+            bg=bg,
+            fg=fg_sub
         ).pack(pady=20)
 
 def populate_updates():
     clear_frame(updates_inner)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_sub = colors["fg_sub"]
+    updates_inner.configure(bg=bg)
+    upd_canvas.configure(bg=bg)
+
     any_updates = False
     for app in all_apps:
         app_id = app["id"]
@@ -644,8 +653,8 @@ def populate_updates():
             updates_inner,
             text="All apps are up to date.",
             font=("Arial", 11),
-            bg=updates_inner.cget("bg"),
-            fg="#9ca3af" if settings.get("theme") != "light" else "#4b5563"
+            bg=bg,
+            fg=fg_sub
         ).pack(pady=20)
 
 def refresh_all_views(*args):
@@ -654,6 +663,7 @@ def refresh_all_views(*args):
     populate_installed()
     populate_updates()
     build_settings_page()
+    apply_colors_to_shell()
 
 # =========================
 # Settings UI
@@ -662,25 +672,23 @@ def refresh_all_views(*args):
 def on_theme_change(new_theme):
     settings["theme"] = new_theme
     save_settings(settings)
-    apply_theme(root)
     refresh_all_views()
     update_nav_style()
 
 def choose_tile_color():
-    color = colorchooser.askcolor(initialcolor=settings.get("tile_bg_color"))[1]
+    initial = get_safe_color(settings.get("tile_bg_color"), "#1f3b5b")
+    color = colorchooser.askcolor(initialcolor=initial)[1]
     if color:
         settings["tile_bg_color"] = color
         save_settings(settings)
-        apply_theme(root)
         refresh_all_views()
 
 def choose_bg_color():
-    color = colorchooser.askcolor(initialcolor=settings.get("background_color"))[1]
+    initial = get_safe_color(settings.get("background_color"), "#0b1220")
+    color = colorchooser.askcolor(initialcolor=initial)[1]
     if color:
         settings["background_color"] = color
-        settings["background_mode"] = "color"
         save_settings(settings)
-        apply_theme(root)
         refresh_all_views()
 
 def reset_settings():
@@ -693,21 +701,25 @@ def reset_settings():
     for k in list(settings.keys()):
         settings[k] = DEFAULT_SETTINGS.get(k, settings[k])
     save_settings(settings)
-    apply_theme(root)
     refresh_all_views()
     update_nav_style()
 
 def build_settings_page():
     clear_frame(settings_frame)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_main = colors["fg_main"]
+    fg_sub = colors["fg_sub"]
+    settings_frame.configure(bg=bg)
 
-    title = ttk.Label(settings_frame, text="Settings", font=("Arial", 16, "bold"))
+    title = tk.Label(settings_frame, text="Settings",
+                     font=("Arial", 16, "bold"), bg=bg, fg=fg_main)
     title.pack(anchor="w", pady=(15, 10), padx=20)
 
-    # Theme
-    theme_label = ttk.Label(settings_frame, text="Theme:")
+    theme_label = tk.Label(settings_frame, text="Theme:", bg=bg, fg=fg_main)
     theme_label.pack(anchor="w", padx=20)
 
-    theme_frame = ttk.Frame(settings_frame)
+    theme_frame = tk.Frame(settings_frame, bg=bg)
     theme_frame.pack(anchor="w", padx=20, pady=(4, 10))
 
     current_theme = settings.get("theme", "soft_blue")
@@ -723,22 +735,22 @@ def build_settings_page():
     ttk.Radiobutton(theme_frame, text="Dark", value="dark",
                     variable=theme_var, command=change_theme).pack(side="left", padx=4)
 
-    # Tile color
-    tile_label = ttk.Label(settings_frame, text="App tile background color:")
+    tile_label = tk.Label(settings_frame, text="App tile background color:",
+                          bg=bg, fg=fg_main)
     tile_label.pack(anchor="w", padx=20, pady=(10, 0))
 
     tile_btn = ttk.Button(settings_frame, text="Choose tile color", command=choose_tile_color)
     tile_btn.pack(anchor="w", padx=20, pady=(4, 10))
 
-    # Background
-    bg_label = ttk.Label(settings_frame, text="Background color:")
+    bg_label = tk.Label(settings_frame, text="Background color:",
+                        bg=bg, fg=fg_main)
     bg_label.pack(anchor="w", padx=20, pady=(10, 0))
 
     bg_btn = ttk.Button(settings_frame, text="Choose background color", command=choose_bg_color)
     bg_btn.pack(anchor="w", padx=20, pady=(4, 10))
 
-    # Startup tab
-    startup_label = ttk.Label(settings_frame, text="Startup page:")
+    startup_label = tk.Label(settings_frame, text="Startup page:",
+                             bg=bg, fg=fg_main)
     startup_label.pack(anchor="w", padx=20, pady=(10, 0))
 
     startup_var = tk.StringVar(value=settings.get("startup_tab", "Home"))
@@ -756,14 +768,15 @@ def build_settings_page():
     startup_combo.bind("<<ComboboxSelected>>", change_startup)
     startup_combo.pack(anchor="w", padx=20, pady=(4, 10))
 
-    # Reset
     reset_btn = ttk.Button(settings_frame, text="Reset to defaults", command=reset_settings)
     reset_btn.pack(anchor="w", padx=20, pady=(12, 5))
 
-    info = ttk.Label(
+    info = tk.Label(
         settings_frame,
         text="Settings are stored in ~/.camcookie/appstore-settings.json",
-        font=("Arial", 9)
+        font=("Arial", 9),
+        bg=bg,
+        fg=fg_sub
     )
     info.pack(anchor="w", padx=20, pady=(10, 0))
 
@@ -777,7 +790,7 @@ current_tab = None
 def set_tab(tab_name):
     global current_tab
     current_tab = tab_name
-    # Frames visibility
+
     home_frame.pack_forget()
     all_apps_frame.pack_forget()
     installed_frame.pack_forget()
@@ -795,38 +808,63 @@ def set_tab(tab_name):
     elif tab_name == "Settings":
         settings_frame.pack(fill="both", expand=True)
 
-    # Button styles
     update_nav_style()
 
 def update_nav_style():
-    theme = settings.get("theme", "soft_blue")
-    active_bg = "#2563eb" if theme == "soft_blue" else "#1f2937"
-    inactive_bg = "#020617" if theme == "soft_blue" else "#111827"
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_main = colors["fg_main"]
+    fg_sub = colors["fg_sub"]
+
+    nav_bg = "#020617" if settings.get("theme") == "soft_blue" else bg
+    active_bg = "#2563eb" if settings.get("theme") == "soft_blue" else "#1f2937"
+    inactive_bg = nav_bg
     active_fg = "#e5e7eb"
-    inactive_fg = "#9ca3af" if theme != "light" else "#111827"
+    inactive_fg = fg_sub
+
+    nav_bar.configure(bg=nav_bg)
 
     for name, btn in nav_buttons.items():
         if name == current_tab:
-            btn.configure(style="NavActive.TButton")
+            btn.configure(
+                style="NavActive.TButton"
+            )
         else:
-            btn.configure(style="NavInactive.TButton")
+            btn.configure(
+                style="NavInactive.TButton"
+            )
 
-    # Configure styles each time in case theme changed
     style = ttk.Style()
     style.configure(
         "NavActive.TButton",
-        background=active_bg,
-        foreground=active_fg,
-        padding=(14, 6)
+        padding=(14, 6),
+        foreground=active_fg
     )
-    style.map("NavActive.TButton", background=[("active", active_bg)])
+    style.map(
+        "NavActive.TButton",
+        background=[("!disabled", active_bg), ("active", active_bg)]
+    )
     style.configure(
         "NavInactive.TButton",
-        background=inactive_bg,
-        foreground=inactive_fg,
-        padding=(14, 6)
+        padding=(14, 6),
+        foreground=inactive_fg
     )
-    style.map("NavInactive.TButton", background=[("active", inactive_bg)])
+    style.map(
+        "NavInactive.TButton",
+        background=[("!disabled", inactive_bg), ("active", inactive_bg)]
+    )
+
+def apply_colors_to_shell():
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_main = colors["fg_main"]
+    fg_sub = colors["fg_sub"]
+
+    root.configure(bg=bg)
+    title_bar.configure(bg=bg)
+    title_label.configure(bg=bg, fg=fg_main)
+    version_label.configure(bg=bg, fg=fg_sub)
+    content.configure(bg=bg)
 
 # =========================
 # Main
@@ -834,14 +872,17 @@ def update_nav_style():
 
 def main():
     global root, home_frame, all_apps_frame, installed_frame, updates_frame, settings_frame
-    global all_apps, local_versions, all_apps_inner, installed_inner, updates_inner
-    global all_search_var, nav_buttons
+    global all_apps, local_versions
+    global all_apps_inner, installed_inner, updates_inner
+    global all_search_var, all_canvas, inst_canvas, upd_canvas
+    global nav_bar, nav_buttons, title_bar, title_label, version_label, content
 
     if not os.path.exists(LOCAL_DB):
         with open(LOCAL_DB, "w") as f:
             f.write("{}")
 
-    local_versions = load_local_versions()
+    local_versions_dict = load_local_versions()
+    globals()["local_versions"] = local_versions_dict
 
     try:
         apps = load_catalog()
@@ -850,38 +891,42 @@ def main():
         messagebox.showerror("Error", f"Failed to load app catalog:\n{e}")
         return
 
-    all_apps = apps
+    globals()["all_apps"] = apps
 
-    # Self-update
     check_self_update(apps)
 
-    # Root window
     root = tk.Tk()
     root.title("Camcookie Appstore V12")
     root.geometry("900x650")
 
-    apply_theme(root)
+    colors = get_theme_colors()
+    bg = colors["bg"]
+    fg_main = colors["fg_main"]
+    fg_sub = colors["fg_sub"]
 
-    # Top title
-    title_bar = ttk.Frame(root, style="Main.TFrame")
+    root.configure(bg=bg)
+
+    title_bar = tk.Frame(root, bg=bg)
     title_bar.pack(fill="x", padx=16, pady=(10, 0))
 
-    title_label = ttk.Label(
+    title_label = tk.Label(
         title_bar, text="Camcookie Appstore",
-        font=("Arial", 20, "bold")
+        font=("Arial", 20, "bold"),
+        bg=bg, fg=fg_main
     )
     title_label.pack(side="left")
 
-    version_label = ttk.Label(
+    version_label = tk.Label(
         title_bar,
         text="V12",
-        font=("Arial", 9, "italic")
+        font=("Arial", 9, "italic"),
+        bg=bg, fg=fg_sub
     )
     version_label.pack(side="left", padx=(8, 0))
 
-    # Navigation bar
-    nav_bar = ttk.Frame(root, style="Nav.TFrame")
+    nav_bar = tk.Frame(root, bg="#020617" if settings.get("theme") == "soft_blue" else bg)
     nav_bar.pack(fill="x", padx=16, pady=(10, 6))
+    globals()["nav_bar"] = nav_bar
 
     def make_nav_button(name):
         btn = ttk.Button(
@@ -895,28 +940,24 @@ def main():
     for tab_name in ["Home", "All Apps", "Installed", "Updates", "Settings"]:
         make_nav_button(tab_name)
 
-    # Main content container
-    content = ttk.Frame(root, style="Main.TFrame")
+    content = tk.Frame(root, bg=bg)
     content.pack(fill="both", expand=True, padx=16, pady=(0, 12))
 
-    # Home frame
-    home_frame = tk.Frame(content, bg=content.cget("background"))
+    home_frame = tk.Frame(content, bg=bg)
 
-    # All apps frame
-    all_apps_frame = tk.Frame(content, bg=content.cget("background"))
-    all_search_bar = ttk.Frame(all_apps_frame)
+    all_apps_frame = tk.Frame(content, bg=bg)
+    all_search_bar = tk.Frame(all_apps_frame, bg=bg)
     all_search_bar.pack(fill="x", pady=(8, 4), padx=10)
 
-    ttk.Label(all_search_bar, text="Search:").pack(side="left")
+    tk.Label(all_search_bar, text="Search:", bg=bg, fg=fg_main).pack(side="left")
     all_search_var = tk.StringVar()
     all_search_entry = ttk.Entry(all_search_bar, textvariable=all_search_var, width=40)
     all_search_entry.pack(side="left", padx=6, fill="x", expand=True)
     all_search_var.trace_add("write", lambda *args: populate_all_apps())
 
-    all_canvas = tk.Canvas(all_apps_frame, highlightthickness=0, bd=0,
-                           bg=content.cget("background"))
+    all_canvas = tk.Canvas(all_apps_frame, highlightthickness=0, bd=0, bg=bg)
     all_scrollbar = ttk.Scrollbar(all_apps_frame, orient="vertical", command=all_canvas.yview)
-    all_apps_inner = tk.Frame(all_canvas, bg=content.cget("background"))
+    all_apps_inner = tk.Frame(all_canvas, bg=bg)
 
     all_apps_inner.bind(
         "<Configure>",
@@ -929,12 +970,10 @@ def main():
     all_canvas.pack(side="left", fill="both", expand=True)
     all_scrollbar.pack(side="right", fill="y")
 
-    # Installed frame
-    installed_frame = tk.Frame(content, bg=content.cget("background"))
-    inst_canvas = tk.Canvas(installed_frame, highlightthickness=0, bd=0,
-                            bg=content.cget("background"))
+    installed_frame = tk.Frame(content, bg=bg)
+    inst_canvas = tk.Canvas(installed_frame, highlightthickness=0, bd=0, bg=bg)
     inst_scrollbar = ttk.Scrollbar(installed_frame, orient="vertical", command=inst_canvas.yview)
-    installed_inner = tk.Frame(inst_canvas, bg=content.cget("background"))
+    installed_inner = tk.Frame(inst_canvas, bg=bg)
 
     installed_inner.bind(
         "<Configure>",
@@ -946,12 +985,10 @@ def main():
     inst_canvas.pack(side="left", fill="both", expand=True)
     inst_scrollbar.pack(side="right", fill="y")
 
-    # Updates frame
-    updates_frame = tk.Frame(content, bg=content.cget("background"))
-    upd_canvas = tk.Canvas(updates_frame, highlightthickness=0, bd=0,
-                           bg=content.cget("background"))
+    updates_frame = tk.Frame(content, bg=bg)
+    upd_canvas = tk.Canvas(updates_frame, highlightthickness=0, bd=0, bg=bg)
     upd_scrollbar = ttk.Scrollbar(updates_frame, orient="vertical", command=upd_canvas.yview)
-    updates_inner = tk.Frame(upd_canvas, bg=content.cget("background"))
+    updates_inner = tk.Frame(upd_canvas, bg=bg)
 
     updates_inner.bind(
         "<Configure>",
@@ -963,13 +1000,22 @@ def main():
     upd_canvas.pack(side="left", fill="both", expand=True)
     upd_scrollbar.pack(side="right", fill="y")
 
-    # Settings frame
-    settings_frame = tk.Frame(content, bg=content.cget("background"))
+    settings_frame = tk.Frame(content, bg=bg)
 
-    # Initial content
+    globals().update({
+        "home_frame": home_frame,
+        "all_apps_frame": all_apps_frame,
+        "installed_frame": installed_frame,
+        "updates_frame": updates_frame,
+        "settings_frame": settings_frame,
+        "content": content,
+        "all_canvas": all_canvas,
+        "inst_canvas": inst_canvas,
+        "upd_canvas": upd_canvas
+    })
+
     refresh_all_views()
 
-    # Start on configured tab
     start_tab = settings.get("startup_tab", "Home")
     if start_tab not in ["Home", "All Apps", "Installed", "Updates", "Settings"]:
         start_tab = "Home"
