@@ -12,6 +12,7 @@
     overflow: hidden;
     background: #f4f4f4;
   }
+
   #editorPanel {
     width: 50%;
     padding: 10px;
@@ -21,6 +22,12 @@
     background: #ffffff;
     border-right: 2px solid #ddd;
   }
+
+  header {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
   textarea {
     flex: 1;
     width: 100%;
@@ -30,16 +37,15 @@
     padding: 8px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
   }
+
   #preview {
     width: 50%;
     border: none;
     background: white;
   }
-  header {
-    font-size: 20px;
-    font-weight: bold;
-  }
+
   button {
     padding: 6px 12px;
     font-size: 14px;
@@ -49,10 +55,18 @@
     color: white;
     cursor: pointer;
   }
+
   button:hover {
     background: #3a78c2;
   }
+
   input {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  select {
     padding: 6px;
     border-radius: 6px;
     border: 1px solid #ccc;
