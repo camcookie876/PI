@@ -43,6 +43,34 @@
       "launch": "$HOME/camcookie-actions/venv/bin/python3 $HOME/camcookie-actions/camcookie_actions.py",
       "version": "1.0",
       "files": []
-    }
+    },
+    {
+  "id": "htmlmaker",
+  "name": "HTML Maker",
+  "creator": "Camcookie INC",
+  "description": "A Raspberry Pi HTML editor with live preview. Build and test HTML pages directly on your Pi using a clean split-screen editor and preview window.",
+  "icon": "https://camcookie876.github.io/app/appstore/icons/htmlmaker.png",
+  "install": [
+    "sudo apt update",
+    "sudo apt install -y python3 python3-pip python3-venv chromium-browser",
+    "mkdir -p $HOME/htmlmaker",
+    "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/htmlmaker.py -O $HOME/htmlmaker/htmlmaker.py",
+    "wget https://camcookie876.github.io/app/appstore/apps/htmlmaker/editor.html -O $HOME/htmlmaker/editor.html",
+    "chmod +x $HOME/htmlmaker/htmlmaker.py",
+    "echo '[Desktop Entry]' > $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Type=Application' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Name=HTML Maker' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Exec=chromium-browser --app=http://localhost:8000' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Terminal=false' >> $HOME/.local/share/applications/htmlmaker.desktop",
+    "echo 'Categories=Development;' >> $HOME/.local/share/applications/htmlmaker.desktop"
+  ],
+  "uninstall": [
+    "rm -rf $HOME/htmlmaker",
+    "rm -f $HOME/.local/share/applications/htmlmaker.desktop"
+  ],
+  "launch": "python3 $HOME/htmlmaker/htmlmaker.py",
+  "version": "1.0",
+  "files": []
+}
   ]
 }
