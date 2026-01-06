@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import time
 import threading
+import tkinter as tk
 import RPi.GPIO as GPIO
 import pyautogui
 
@@ -14,6 +15,7 @@ import pyautogui
 class BasePlugin:
     def __init__(self, manager):
         self.manager = manager
+        self.status = "Idle"
 
     def start(self):
         pass
@@ -21,8 +23,8 @@ class BasePlugin:
     def stop(self):
         pass
 
-    def update(self):
-        pass
+    def get_status(self):
+        return self.status
 
 
 # ------------------------------------------------------------
@@ -61,44 +63,25 @@ class CookieJoystick(BasePlugin):
         GPIO.add_event_detect(self.PIN_RIGHT, GPIO.BOTH, callback=self._right, bouncetime=30)
         GPIO.add_event_detect(self.PIN_CLICK, GPIO.FALLING, callback=self._click, bouncetime=150)
 
-    # GPIO callbacks
-    def _up(self, ch):
-        self.up = (GPIO.input(self.PIN_UP) == GPIO.LOW)
+    def _up(self, ch): self.up = (GPIO.input(self.PIN_UP) == GPIO.LOW)
+    def _down(self, ch): self.down = (GPIO.input(self.PIN_DOWN) == GPIO.LOW)
+    def _left(self, ch): self.left = (GPIO.input(self.PIN_LEFT) == GPIO.LOW)
+    def _right(self, ch): self.right = (GPIO.input(self.PIN_RIGHT) == GPIO.LOW)
+    def _click(self, ch): pyautogui.click()
 
-    def _down(self, ch):
-        self.down = (GPIO.input(self.PIN_DOWN) == GPIO.LOW)
-
-    def _left(self, ch):
-        self.left = (GPIO.input(self.PIN_LEFT) == GPIO.LOW)
-
-    def _right(self, ch):
-        self.right = (GPIO.input(self.PIN_RIGHT) == GPIO.LOW)
-
-    def _click(self, ch):
-        pyautogui.click()
-
-    # Movement loop
     def _loop(self):
         while self.running:
-            dx = 0
-            dy = 0
-
-            if self.up and not self.down:
-                dy -= self.CURSOR_STEP
-            elif self.down and not self.up:
-                dy += self.CURSOR_STEP
-
-            if self.left and not self.right:
-                dx -= self.CURSOR_STEP
-            elif self.right and not self.left:
-                dx += self.CURSOR_STEP
-
-            if dx != 0 or dy != 0:
-                try:
-                    pyautogui.moveRel(dx, dy, duration=0)
-                except Exception as e:
-                    print("[Joystick] Cursor error:", e)
-
+            dx = dy = 0
+            if self.up and not self.down: dy -= self.CURSOR_STEP
+            elif self.down and not self.up: dy += self.CURSOR_STEP
+            if self.left and not self.right: dx -= self.CURSOR_STEP
+            elif self.right and not self.left: dx += self.CURSOR_STEP
+            if dx or dy:
+                try: pyautogui.moveRel(dx, dy, duration=0)
+                except Exception as e: print("[Joystick] Cursor error:", e)
+                self.status = f"Moving ({dx},{dy})"
+            else:
+                self.status = "Idle"
             time.sleep(self.LOOP_DELAY)
 
     def start(self):
@@ -109,8 +92,7 @@ class CookieJoystick(BasePlugin):
 
     def stop(self):
         self.running = False
-        if self.thread:
-            self.thread.join(timeout=1)
+        if self.thread: self.thread.join(timeout=1)
         print("[CookieJoystick] Stopped")
 
 
@@ -134,6 +116,50 @@ class PluginManager:
         for p in self.plugins:
             p.stop()
 
+    def get_statuses(self):
+        return [(type(p).__name__, p.get_status()) for p in self.plugins]
+
+
+# ------------------------------------------------------------
+# Camcookie Plugin UI
+# ------------------------------------------------------------
+class CamcookieUI:
+    def __init__(self, manager):
+        self.manager = manager
+        self.root = tk.Tk()
+        self.root.title("Camcookie Plugin")
+        self.root.geometry("400x300")
+        self.root.configure(bg="#f0f0ff")
+
+        self.title = tk.Label(self.root, text="Camcookie Plugin", font=("Arial", 18, "bold"), bg="#f0f0ff")
+        self.title.pack(pady=10)
+
+        self.instructions = tk.Label(self.root, text="Joystick controls your mouse.\nPress down to click.\nMore plugins coming soon!", font=("Arial", 12), bg="#f0f0ff")
+        self.instructions.pack(pady=5)
+
+        self.status_frame = tk.Frame(self.root, bg="#f0f0ff")
+        self.status_frame.pack(pady=10)
+
+        self.status_labels = []
+
+        self.update_loop()
+
+    def update_loop(self):
+        for label in self.status_labels:
+            label.destroy()
+        self.status_labels.clear()
+
+        statuses = self.manager.get_statuses()
+        for name, status in statuses:
+            lbl = tk.Label(self.status_frame, text=f"{name}: {status}", font=("Arial", 11), bg="#f0f0ff")
+            lbl.pack()
+            self.status_labels.append(lbl)
+
+        self.root.after(500, self.update_loop)
+
+    def run(self):
+        self.root.mainloop()
+
 
 # ------------------------------------------------------------
 # Main Camcookie Plugin App
@@ -142,18 +168,12 @@ def main():
     print("=== Camcookie Plugin App ===")
 
     manager = PluginManager()
-
-    # Register all plugins here
     manager.register(CookieJoystick)
-
-    # Start everything
     manager.start_all()
 
-    print("Camcookie Plugins running. Press Ctrl+C to exit.")
-
+    ui = CamcookieUI(manager)
     try:
-        while True:
-            time.sleep(1)
+        ui.run()
     except KeyboardInterrupt:
         print("\nShutting down Camcookie Plugins...")
     finally:
