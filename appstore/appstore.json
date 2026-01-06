@@ -75,12 +75,11 @@
   "id": "camcookieplugin",
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
-  "description": "The official Camcookie hardware engine. Includes joystick control, GPIO plugins, sensor support, and a live status window. Move your cursor with a joystick, click by pressing down, and see plugin activity in real time.",
+  "description": "The official Camcookie hardware engine. Includes joystick control, Arduino serial support, GPIO plugins, and a styled UI with live plugin status.",
   "icon": "https://camcookie876.github.io/app/appstore/app/icons/plugin.png",
   "install": [
     "sudo apt update",
-    "sudo apt install -y python3 python3-pip python3-tk xdotool",
-    "sudo apt install -y xdotool",
+    "sudo apt install -y python3 python3-pip python3-tk xdotool python3-serial",
     "mkdir -p $HOME/camcookieplugin",
     "wget https://camcookie876.github.io/app/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
     "chmod +x $HOME/camcookieplugin/app.py",
@@ -96,7 +95,7 @@
     "rm -f $HOME/.local/share/applications/camcookieplugin.desktop"
   ],
   "launch": "python3 $HOME/camcookieplugin/app.py",
-  "version": "1.2",
+  "version": "1.3",
   "files": []
 }
   ]

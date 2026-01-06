@@ -2,11 +2,14 @@
 import time
 import threading
 import subprocess
+import serial
+import serial.tools.list_ports
 import tkinter as tk
 import RPi.GPIO as GPIO
 
 # ============================================================
-#  CAMCOOKIE PLUGIN APP — UNIFIED HARDWARE EXTENSION SYSTEM
+#  CAMCOOKIE PLUGIN — VERSION 2
+#  Styled UI + Instructions + Arduino Serial Support
 # ============================================================
 
 # ------------------------------------------------------------
@@ -38,7 +41,7 @@ class BasePlugin:
 
 
 # ------------------------------------------------------------
-# CookieJoystick Plugin
+# CookieJoystick Plugin (GPIO)
 # ------------------------------------------------------------
 class CookieJoystick(BasePlugin):
     PIN_UP = 17
@@ -114,6 +117,70 @@ class CookieJoystick(BasePlugin):
 
 
 # ------------------------------------------------------------
+# Arduino Serial Plugin
+# ------------------------------------------------------------
+class ArduinoPlugin(BasePlugin):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.running = False
+        self.thread = None
+        self.serial_port = None
+
+    def find_arduino(self):
+        ports = serial.tools.list_ports.comports()
+        for p in ports:
+            if "Arduino" in p.description or "ttyACM" in p.device:
+                return p.device
+        return None
+
+    def start(self):
+        port = self.find_arduino()
+        if not port:
+            self.status = "No Arduino found"
+            return
+
+        try:
+            self.serial_port = serial.Serial(port, 9600, timeout=1)
+            self.running = True
+            self.thread = threading.Thread(target=self._loop, daemon=True)
+            self.thread.start()
+            self.status = "Connected"
+        except Exception as e:
+            self.status = f"Error: {e}"
+
+    def _loop(self):
+        while self.running:
+            try:
+                line = self.serial_port.readline().decode().strip()
+                if line:
+                    self.status = f"Data: {line}"
+
+                    # Example protocol:
+                    # MOVE x y
+                    # CLICK
+                    parts = line.split()
+
+                    if parts[0] == "MOVE" and len(parts) == 3:
+                        dx = int(parts[1])
+                        dy = int(parts[2])
+                        move_mouse(dx, dy)
+
+                    elif parts[0] == "CLICK":
+                        click_mouse()
+
+            except:
+                self.status = "Serial error"
+
+    def stop(self):
+        self.running = False
+        if self.thread:
+            self.thread.join(timeout=1)
+        if self.serial_port:
+            self.serial_port.close()
+        print("[ArduinoPlugin] Stopped")
+
+
+# ------------------------------------------------------------
 # Plugin Manager
 # ------------------------------------------------------------
 class PluginManager:
@@ -138,28 +205,41 @@ class PluginManager:
 
 
 # ------------------------------------------------------------
-# Camcookie Plugin UI
+# Styled UI
 # ------------------------------------------------------------
 class CamcookieUI:
     def __init__(self, manager):
         self.manager = manager
         self.root = tk.Tk()
         self.root.title("Camcookie Plugin")
-        self.root.geometry("420x320")
-        self.root.configure(bg="#f0f0ff")
+        self.root.geometry("450x360")
+        self.root.configure(bg="#e8e8ff")
 
-        self.title = tk.Label(self.root, text="Camcookie Plugin", font=("Arial", 18, "bold"), bg="#f0f0ff")
-        self.title.pack(pady=10)
-
-        self.instructions = tk.Label(
+        # Title
+        tk.Label(
             self.root,
-            text="Joystick controls your mouse.\nPress down to click.\nMore plugins coming soon!",
-            font=("Arial", 12),
-            bg="#f0f0ff"
-        )
-        self.instructions.pack(pady=5)
+            text="Camcookie Plugin",
+            font=("Arial Rounded MT Bold", 20),
+            bg="#e8e8ff"
+        ).pack(pady=10)
 
-        self.status_frame = tk.Frame(self.root, bg="#f0f0ff")
+        # Instructions box
+        frame = tk.Frame(self.root, bg="#ffffff", bd=2, relief="ridge")
+        frame.pack(pady=10, padx=20, fill="x")
+
+        tk.Label(
+            frame,
+            text="• Joystick controls your mouse\n"
+                 "• Press down to click\n"
+                 "• Arduino can send MOVE and CLICK commands\n"
+                 "• More plugins coming soon!",
+            font=("Arial", 12),
+            bg="#ffffff",
+            justify="left"
+        ).pack(padx=10, pady=10)
+
+        # Status panel
+        self.status_frame = tk.Frame(self.root, bg="#e8e8ff")
         self.status_frame.pack(pady=10)
 
         self.status_labels = []
@@ -173,7 +253,12 @@ class CamcookieUI:
 
         statuses = self.manager.get_statuses()
         for name, status in statuses:
-            lbl = tk.Label(self.status_frame, text=f"{name}: {status}", font=("Arial", 11), bg="#f0f0ff")
+            lbl = tk.Label(
+                self.status_frame,
+                text=f"{name}: {status}",
+                font=("Arial", 11),
+                bg="#e8e8ff"
+            )
             lbl.pack()
             self.status_labels.append(lbl)
 
@@ -184,13 +269,16 @@ class CamcookieUI:
 
 
 # ------------------------------------------------------------
-# Main Camcookie Plugin App
+# Main App
 # ------------------------------------------------------------
 def main():
-    print("=== Camcookie Plugin App ===")
+    print("=== Camcookie Plugin v2 ===")
 
     manager = PluginManager()
+
     manager.register(CookieJoystick)
+    manager.register(ArduinoPlugin)
+
     manager.start_all()
 
     ui = CamcookieUI(manager)
