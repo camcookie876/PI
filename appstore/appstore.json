@@ -5,7 +5,7 @@
       "name": "Camcookie App Store",
       "creator": "Camcookie INC",
       "description": "The Camcookie Appstore",
-      "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieappstore.png",
+      "icon": "https://camcookie876.github.io/app/appstore/apps/icons/camcookieappstore.png",
       "install": [
         "curl -sSL https://camcookie876.github.io/app/appstore/install-appstore.sh | bash"
       ],
@@ -23,7 +23,7 @@
       "name": "Camcookie Actions",
       "creator": "Camcookie INC",
       "description": "Offline voice assistant for Raspberry Pi OS. Uses Vosk, pyttsx3, and PyAutoGUI for real offline control. More infromation at https://github.com/camcookie876/PY-M/tree/main/camcookie-for-pi/actions#-camcookie-actions",
-      "icon": "https://camcookie876.github.io/app/appstore/icons/camcookieactions.png",
+      "icon": "https://camcookie876.github.io/app/appstore/apps/icons/camcookieactions.png",
       "install": [
         "sudo apt update && sudo apt full-upgrade -y",
         "sudo apt install -y python3-full python3-venv python3-pip portaudio19-dev ffmpeg scrot unzip wget espeak-ng",
@@ -49,7 +49,7 @@
   "name": "Python Maker",
   "creator": "Camcookie INC",
   "description": "A simple Raspberry Pi Python editor and runner. Write Python code, run it, and see output instantly.",
-  "icon": "https://camcookie876.github.io/app/appstore/icons/pythonmaker.png",
+  "icon": "https://camcookie876.github.io/app/appstore/apps/icons/pythonmaker.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk",
@@ -76,7 +76,7 @@
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
   "description": "The official Camcookie hardware engine. Includes joystick control, GPIO plugins, sensor support, and a live status window. Move your cursor with a joystick, click by pressing down, and see plugin activity in real time.",
-  "icon": "https://camcookie876.github.io/app/appstore/icons/plugin.png",
+  "icon": "https://camcookie876.github.io/app/appstore/apps/icons/plugin.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk xdotool",
