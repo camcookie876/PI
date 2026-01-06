@@ -70,6 +70,34 @@
   "launch": "python3 $HOME/pythonmaker/pythonmaker.py",
   "version": "1.0",
   "files": []
+},
+{
+  "id": "camcookieplugin",
+  "name": "Camcookie Plugin",
+  "creator": "Camcookie INC",
+  "description": "The official Camcookie hardware engine. Adds joystick control, GPIO plugins, sensors, buzzers, and more to Camcookie OS.",
+  "icon": "https://camcookie876.github.io/app/appstore/icons/plugin.png",
+  "install": [
+    "sudo apt update",
+    "sudo apt install -y python3 python3-pip python3-tk xdotool",
+    "pip3 install pyautogui",
+    "mkdir -p $HOME/camcookieplugin",
+    "wget https://camcookie876.github.io/app/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
+    "chmod +x $HOME/camcookieplugin/app.py",
+    "echo '[Desktop Entry]' > $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Type=Application' >> $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Name=Camcookie Plugin' >> $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Exec=python3 $HOME/camcookieplugin/app.py' >> $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Terminal=false' >> $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Categories=Utility;' >> $HOME/.local/share/applications/camcookieplugin.desktop"
+  ],
+  "uninstall": [
+    "rm -rf $HOME/camcookieplugin",
+    "rm -f $HOME/.local/share/applications/camcookieplugin.desktop"
+  ],
+  "launch": "python3 $HOME/camcookieplugin/app.py",
+  "version": "1.0",
+  "files": []
 }
   ]
 }
