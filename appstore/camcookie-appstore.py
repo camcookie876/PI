@@ -98,7 +98,7 @@ def load_catalog():
         return json.loads(data)["apps"]
 
 # =========================
-# Icon handling
+# Icon handling (V1.5: resize + rounded background)
 # =========================
 
 def get_icon_path_for_app(app):
@@ -124,29 +124,74 @@ def download_icon_if_needed(app):
             return None
     return local_icon_path
 
-def load_icon_image(app):
+def load_icon_image(app, max_size=56):
+    """
+    Load and downscale icon to fit inside max_size x max_size,
+    preserving aspect ratio, using PhotoImage.subsample.
+    """
     app_id = app.get("id", "unknown")
-    if app_id in icon_cache_images:
-        return icon_cache_images[app_id]
+    cache_key = f"{app_id}_{max_size}"
+    if cache_key in icon_cache_images:
+        return icon_cache_images[cache_key]
+
     local_icon_path = download_icon_if_needed(app)
     if not local_icon_path or not os.path.exists(local_icon_path):
         return None
     try:
         img = tk.PhotoImage(file=local_icon_path)
-        icon_cache_images[app_id] = img
-        return img
     except Exception:
         return None
 
+    w = img.width()
+    h = img.height()
+    if w <= 0 or h <= 0:
+        return None
+
+    # Compute integer subsample factor to ensure the image fits inside max_size
+    factor = max(1, max(w // max_size, h // max_size))
+    if factor > 1:
+        try:
+            img = img.subsample(factor, factor)
+        except Exception:
+            pass  # If subsample fails, keep original (worst case, still works but larger)
+
+    icon_cache_images[cache_key] = img
+    return img
+
 def clear_icon_cache_for_app(app_id):
-    if app_id in icon_cache_images:
-        del icon_cache_images[app_id]
+    keys_to_delete = [k for k in icon_cache_images.keys() if k.startswith(app_id + "_")]
+    for k in keys_to_delete:
+        del icon_cache_images[k]
     for fname in os.listdir(ICON_CACHE_DIR):
         if fname.startswith(app_id):
             try:
                 os.remove(os.path.join(ICON_CACHE_DIR, fname))
             except Exception:
                 pass
+
+def create_rounded_icon_widget(parent, app, tile_bg, size=64, icon_size=56):
+    """
+    Creates a canvas with a rounded background and the app icon centered inside.
+    - size: total canvas size (e.g., 64x64)
+    - icon_size: target maximum icon size inside the rounded area
+    """
+    canvas = tk.Canvas(parent, width=size, height=size, bg=tile_bg,
+                       highlightthickness=0, bd=0)
+    # Rounded/circular background
+    margin = 4
+    canvas.create_oval(margin, margin, size - margin, size - margin,
+                       fill="#0f172a", outline="")
+
+    icon_img = load_icon_image(app, max_size=icon_size)
+    if icon_img is not None:
+        canvas.create_image(size // 2, size // 2, image=icon_img)
+        # Keep a reference so it's not garbage collected
+        canvas.image = icon_img
+    else:
+        # Fallback emoji placeholder
+        canvas.create_text(size // 2, size // 2, text="🟦", font=("Arial", 18))
+
+    return canvas
 
 # =========================
 # Files from JSON
@@ -384,14 +429,11 @@ def open_app_details(app):
     header = tk.Frame(details, bg=bg)
     header.pack(fill="x", padx=20, pady=(20, 10))
 
-    icon_img = load_icon_image(app)
-    if icon_img:
-        icon_label = tk.Label(header, image=icon_img, bg=bg)
-        icon_label.image = icon_img
-        icon_label.pack(side="left", padx=(0, 12))
-    else:
-        icon_label = tk.Label(header, text="🟦", font=("Arial", 24), bg=bg, fg=fg)
-        icon_label.pack(side="left", padx=(0, 12))
+    # Rounded icon in details view
+    icon_container = tk.Frame(header, bg=bg)
+    icon_container.pack(side="left", padx=(0, 12))
+    icon_canvas = create_rounded_icon_widget(icon_container, app, tile_bg=bg, size=64, icon_size=56)
+    icon_canvas.pack()
 
     name_frame = tk.Frame(header, bg=bg)
     name_frame.pack(side="left", fill="x", expand=True)
@@ -465,21 +507,11 @@ def build_app_card(parent, app, compact=False):
     top_frame = tk.Frame(inner, bg=tile_bg)
     top_frame.pack(fill="x")
 
-    icon_img = load_icon_image(app)
-    if icon_img is not None:
-        icon_label = tk.Label(top_frame, image=icon_img, bg=tile_bg)
-        icon_label.image = icon_img
-        icon_label.pack(side="left", padx=(0, 10))
-    else:
-        placeholder = tk.Label(
-            top_frame,
-            text="🟦",
-            font=("Arial", 20),
-            width=2,
-            bg=tile_bg,
-            fg="white"
-        )
-        placeholder.pack(side="left", padx=(0, 10))
+    # Rounded icon container
+    icon_container = tk.Frame(top_frame, bg=tile_bg)
+    icon_container.pack(side="left", padx=(0, 10))
+    icon_canvas = create_rounded_icon_widget(icon_container, app, tile_bg=tile_bg, size=64, icon_size=56)
+    icon_canvas.pack()
 
     text_frame = tk.Frame(top_frame, bg=tile_bg)
     text_frame.pack(side="left", fill="x", expand=True)
@@ -896,7 +928,7 @@ def main():
     check_self_update(apps)
 
     root = tk.Tk()
-    root.title("Camcookie Appstore V12")
+    root.title("Camcookie Appstore V1.5")
     root.geometry("900x650")
 
     colors = get_theme_colors()
@@ -918,7 +950,7 @@ def main():
 
     version_label = tk.Label(
         title_bar,
-        text="V12",
+        text="V1.5",
         font=("Arial", 9, "italic"),
         bg=bg, fg=fg_sub
     )

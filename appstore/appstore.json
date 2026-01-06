@@ -15,7 +15,7 @@
         "rm -f $HOME/.camcookie_installed.json"
       ],
       "launch": "python3 $HOME/camcookie-appstore.py",
-      "version": "1.5",
+      "version": "1.6",
       "files": []
     },
     {
@@ -80,7 +80,7 @@
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk xdotool",
-    "pip3 install pyautogui",
+    "sudo apt install -y xdotool",
     "mkdir -p $HOME/camcookieplugin",
     "wget https://camcookie876.github.io/app/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
     "chmod +x $HOME/camcookieplugin/app.py",
@@ -96,7 +96,7 @@
     "rm -f $HOME/.local/share/applications/camcookieplugin.desktop"
   ],
   "launch": "python3 $HOME/camcookieplugin/app.py",
-  "version": "1.1",
+  "version": "1.2",
   "files": []
 }
   ]
