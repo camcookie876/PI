@@ -75,7 +75,7 @@
   "id": "camcookieplugin",
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
-  "description": "The official Camcookie hardware engine. Adds joystick control, GPIO plugins, sensors, buzzers, and more to Camcookie OS.",
+  "description": "The official Camcookie hardware engine. Includes joystick control, GPIO plugins, sensor support, and a live status window. Move your cursor with a joystick, click by pressing down, and see plugin activity in real time.",
   "icon": "https://camcookie876.github.io/app/appstore/icons/plugin.png",
   "install": [
     "sudo apt update",
