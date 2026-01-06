@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Camcookie Appstore Web</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0b1220;
+        color: #e5e7eb;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+        display: flex;
+        background: #020617;
+        padding: 14px 20px;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .nav-item {
+        color: #9ca3af;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+
+    .nav-item.active {
+        background: #2563eb;
+        color: white;
+    }
+
+    .nav-item:hover {
+        background: #1e3a8a;
+        color: white;
+    }
+
+    /* Page container */
+    .container {
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    /* Search bar */
+    .search-box {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-box input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        font-size: 16px;
+    }
+
+    /* App Card */
+    .app-card {
+        background: #1f3b5b;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .app-card img {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+    }
+
+    .app-info {
+        flex: 1;
+    }
+
+    .app-name {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .app-creator {
+        font-size: 14px;
+        color: #cbd5e1;
+        margin-bottom: 10px;
+    }
+
+    .app-desc {
+        font-size: 14px;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .app-desc a {
+        color: #60a5fa;
+    }
+
+    .version {
+        font-size: 13px;
+        color: #cbd5e1;
+    }
+
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="navbar">
+    <div class="nav-item active" onclick="showPage('home')">Home</div>
+    <div class="nav-item" onclick="showPage('all')">All Apps</div>
+    <div class="nav-item" onclick="showPage('installed')">Installed</div>
+    <div class="nav-item" onclick="showPage('updates')">Updates</div>
+</div>
+
+<!-- Pages -->
+<div id="home" class="container">
+    <h1>Welcome to the Camcookie Appstore Web</h1>
+    <p style="color:#9ca3af;">Browse apps, view details, and explore the Camcookie ecosystem.</p>
+    <h2>Featured Apps</h2>
+    <div id="featured"></div>
+</div>
+
+<div id="all" class="container" style="display:none;">
+    <h1>All Apps</h1>
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Search apps..." oninput="renderAllApps()">
+    </div>
+    <div id="all-apps"></div>
+</div>
+
+<div id="installed" class="container" style="display:none;">
+    <h1>Installed Apps</h1>
+    <p style="color:#9ca3af;">This web version cannot detect installed apps.</p>
+</div>
+
+<div id="updates" class="container" style="display:none;">
+    <h1>Updates</h1>
+    <p style="color:#9ca3af;">Updates are only available in the desktop Appstore.</p>
+</div>
+
+<script>
+let apps = [];
+
+// Load JSON from GitHub
+fetch("https://camcookie876.github.io/app/appstore/appstore.json")
+    .then(res => res.json())
+    .then(data => {
+        apps = data.apps;
+        renderFeatured();
+        renderAllApps();
+    });
+
+// Navigation switching
+function showPage(page) {
+    document.querySelectorAll(".container").forEach(c => c.style.display = "none");
+    document.getElementById(page).style.display = "block";
+
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    event.target.classList.add("active");
+}
+
+// Render Featured Apps (first 3)
+function renderFeatured() {
+    const featured = document.getElementById("featured");
+    featured.innerHTML = "";
+    apps.slice(0, 3).forEach(app => {
+        featured.appendChild(createAppCard(app));
+    });
+}
+
+// Render All Apps
+function renderAllApps() {
+    const search = document.getElementById("search").value.toLowerCase();
+    const container = document.getElementById("all-apps");
+    container.innerHTML = "";
+
+    apps.forEach(app => {
+        const text = (app.name + " " + app.creator + " " + app.description).toLowerCase();
+        if (text.includes(search)) {
+            container.appendChild(createAppCard(app));
+        }
+    });
+}
+
+// Create App Card
+function createAppCard(app) {
+    const card = document.createElement("div");
+    card.className = "app-card";
+
+    const icon = document.createElement("img");
+    icon.src = app.icon;
+
+    const info = document.createElement("div");
+    info.className = "app-info";
+
+    const name = document.createElement("div");
+    name.className = "app-name";
+    name.textContent = app.name;
+
+    const creator = document.createElement("div");
+    creator.className = "app-creator";
+    creator.textContent = "by " + app.creator;
+
+    const desc = document.createElement("div");
+    desc.className = "app-desc";
+    desc.innerHTML = linkify(app.description);
+
+    const version = document.createElement("div");
+    version.className = "version";
+    version.textContent = "Version: " + app.version;
+
+    info.appendChild(name);
+    info.appendChild(creator);
+    info.appendChild(desc);
+    info.appendChild(version);
+
+    card.appendChild(icon);
+    card.appendChild(info);
+
+    return card;
+}
+
+// Convert URLs in description to clickable links
+function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`);
+}
+</script>
+
+</body>
+</html>
