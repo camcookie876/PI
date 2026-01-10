@@ -16,7 +16,8 @@
       ],
       "launch": "python3 $HOME/camcookie-appstore.py",
       "version": "1.6",
-      "files": []
+      "files": [],
+      "plugin": "NO"
     },
     {
       "id": "camcookieactions",
@@ -42,7 +43,8 @@
       ],
       "launch": "$HOME/camcookie-actions/venv/bin/python3 $HOME/camcookie-actions/camcookie_actions.py",
       "version": "1.0",
-      "files": []
+      "files": [],
+      "plugin": "YES"
     },
 {
   "id": "pythonmaker",
@@ -69,7 +71,8 @@
   ],
   "launch": "python3 $HOME/pythonmaker/pythonmaker.py",
   "version": "1.0",
-  "files": []
+  "files": [],
+  "plugin": "NO"
 },
 {
   "id": "camcookieplugin",
@@ -99,7 +102,8 @@
   ],
   "launch": "python3 $HOME/camcookieplugin/app.py",
   "version": "1.4",
-  "files": []
+  "files": [],
+  "plugin": "NO"
 }
   ]
 }

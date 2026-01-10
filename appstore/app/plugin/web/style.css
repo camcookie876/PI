@@ -1,0 +1,32 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #0099ff;
+  color: #eee;
+  margin: 0;
+  padding: 1rem;
+}
+
+.topnav {
+  background-color: #f99900;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.topnav h1 {
+  margin: 0;
+  color: white;
+}
+
+.beta {
+  font-size: 14px;
+  margin-left: 10px;
+  color: #333;
+}
+
+.card {
+  background: #1f3b5b;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
