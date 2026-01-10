@@ -950,7 +950,7 @@ def main():
 
     version_label = tk.Label(
         title_bar,
-        text="V1.5",
+        text="V1.5 BETA",
         font=("Arial", 9, "italic"),
         bg=bg, fg=fg_sub
     )
