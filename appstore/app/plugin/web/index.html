@@ -3,7 +3,160 @@
 <head>
   <meta charset="UTF-8" />
   <title>Camcookie Plugin V1.5</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background: #0099ff;
+  color: #eee;
+  margin: 0;
+  padding: 1rem;
+}
+
+.topnav {
+  background-color: #f99900;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topnav h1 {
+  margin: 0;
+  color: white;
+  font-size: 22px;
+}
+
+.beta {
+  font-size: 12px;
+  margin-left: 8px;
+  color: #333;
+  background: #ffdd88;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.nav-link.active {
+  background-color: #04aa6d;
+}
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}
+
+.card {
+  background: #1f3b5b;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+#plugin-list .plugin-item,
+#connect-app-list .connect-app {
+  background: #123456;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plugin-info,
+.connect-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.plugin-name,
+.connect-name {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.plugin-status,
+.connect-status {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.plugin-toggle input {
+  width: 20px;
+  height: 20px;
+}
+
+.connect-actions button {
+  margin-left: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.connect-actions button.connect-btn {
+  background: #04aa6d;
+  color: white;
+}
+
+.connect-actions button.disconnect-btn {
+  background: #e11d48;
+  color: white;
+}
+
+.connect-actions button.shutdown-btn {
+  background: #f97316;
+  color: white;
+}
+
+.connect-status span.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.badge-installed {
+  background: #16a34a;
+}
+
+.badge-not-installed {
+  background: #9ca3af;
+}
+
+.badge-connected {
+  background: #22c55e;
+}
+
+.badge-disconnected {
+  background: #6b7280;
+}
+  </style>
 </head>
 <body>
   <div class="topnav">
@@ -43,6 +196,225 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script>
+const API_BASE = "http://127.0.0.1:8765";
+
+// Tab handling
+document.querySelectorAll(".nav-link").forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const tabId = link.getAttribute("data-tab");
+
+    document.querySelectorAll(".nav-link").forEach((l) =>
+      l.classList.remove("active")
+    );
+    link.classList.add("active");
+
+    document.querySelectorAll(".tab").forEach((t) =>
+      t.classList.remove("active")
+    );
+    document.getElementById("tab-" + tabId).classList.add("active");
+  });
+});
+
+async function fetchStatus() {
+  try:
+    const res = await fetch(API_BASE + "/status");
+    const data = await res.json();
+    updateUI(data);
+  } catch (e) {
+    console.error("Failed to fetch status", e);
+  }
+}
+
+// Called with data from /status or /plugin/toggle
+function updateUI(state) {
+  const plugins = state.plugins || [];
+  const arduinoData = state.arduino_data || "None";
+  const connectableApps = state.connectable_apps || [];
+
+  // Home tab
+  const running = plugins.filter((p) => p.enabled).length;
+  document.getElementById("plugin-count").innerText =
+    "You currently have " +
+    running +
+    " plugin" +
+    (running === 1 ? "" : "s") +
+    " running";
+
+  document.getElementById("arduino-data").innerText = arduinoData;
+
+  // Plugins tab
+  const list = document.getElementById("plugin-list");
+  list.innerHTML = "";
+  plugins.forEach((p) => {
+    const item = document.createElement("div");
+    item.className = "plugin-item";
+
+    const info = document.createElement("div");
+    info.className = "plugin-info";
+
+    const name = document.createElement("div");
+    name.className = "plugin-name";
+    name.innerText = p.name;
+
+    const status = document.createElement("div");
+    status.className = "plugin-status";
+    status.innerText = p.status;
+
+    info.appendChild(name);
+    info.appendChild(status);
+
+    const toggleDiv = document.createElement("div");
+    toggleDiv.className = "plugin-toggle";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = p.enabled;
+
+    checkbox.addEventListener("change", async () => {
+      try {
+        const res = await fetch(
+          API_BASE +
+            "/plugin/toggle?id=" +
+            encodeURIComponent(p.id) +
+            "&enabled=" +
+            (checkbox.checked ? "1" : "0")
+        );
+        const data = await res.json();
+        if (data.ok && data.state) {
+          updateUI(data.state);
+        }
+      } catch (e) {
+        console.error("Failed to toggle plugin", e);
+      }
+    });
+
+    toggleDiv.appendChild(checkbox);
+
+    item.appendChild(info);
+    item.appendChild(toggleDiv);
+
+    list.appendChild(item);
+  });
+
+  // Connect tab
+  const connectList = document.getElementById("connect-app-list");
+  connectList.innerHTML = "";
+
+  connectableApps.forEach((app) => {
+    const item = document.createElement("div");
+    item.className = "connect-app";
+
+    const info = document.createElement("div");
+    info.className = "connect-info";
+
+    const name = document.createElement("div");
+    name.className = "connect-name";
+    name.innerText = app.name;
+
+    const status = document.createElement("div");
+    status.className = "connect-status";
+
+    if (!app.installed) {
+      const notInstalled = document.createElement("span");
+      notInstalled.className = "badge badge-not-installed";
+      notInstalled.innerText = "Not Installed";
+      status.appendChild(notInstalled);
+    } else {
+      const installedBadge = document.createElement("span");
+      installedBadge.className = "badge badge-installed";
+      installedBadge.innerText = "Installed";
+
+      const connectedBadge = document.createElement("span");
+      connectedBadge.className =
+        "badge " + (app.connected ? "badge-connected" : "badge-disconnected");
+      connectedBadge.innerText = app.connected ? "Connected" : "Not Connected";
+
+      status.appendChild(installedBadge);
+      status.appendChild(document.createTextNode(" "));
+      status.appendChild(connectedBadge);
+    }
+
+    info.appendChild(name);
+    info.appendChild(status);
+
+    item.appendChild(info);
+
+    const actions = document.createElement("div");
+    actions.className = "connect-actions";
+
+    if (app.installed) {
+      const connectBtn = document.createElement("button");
+      connectBtn.className = "connect-btn";
+      connectBtn.innerText = app.connected ? "Reconnect" : "Connect";
+
+      connectBtn.addEventListener("click", async () => {
+        try {
+          const res = await fetch(
+            API_BASE + "/connect?app_id=" + encodeURIComponent(app.id)
+          );
+          const data = await res.json();
+          if (data.ok) {
+            fetchStatus();
+          }
+        } catch (e) {
+          console.error("Failed to connect app", e);
+        }
+      });
+
+      const disconnectBtn = document.createElement("button");
+      disconnectBtn.className = "disconnect-btn";
+      disconnectBtn.innerText = "Disconnect";
+
+      disconnectBtn.addEventListener("click", async () => {
+        try {
+          const res = await fetch(
+            API_BASE + "/disconnect?app_id=" + encodeURIComponent(app.id)
+          );
+          const data = await res.json();
+          if (data.ok) {
+            fetchStatus();
+          }
+        } catch (e) {
+          console.error("Failed to disconnect app", e);
+        }
+      });
+
+      const shutdownBtn = document.createElement("button");
+      shutdownBtn.className = "shutdown-btn";
+      shutdownBtn.innerText = "Request Shutdown";
+
+      shutdownBtn.addEventListener("click", async () => {
+        try {
+          const res = await fetch(
+            API_BASE + "/shutdown?app_id=" + encodeURIComponent(app.id)
+          );
+          const data = await res.json();
+          if (data.ok && data.shutting_down) {
+            alert("Plugin engine will shut down soon (no other apps connected).");
+          } else if (data.ok && !data.shutting_down) {
+            alert("Engine stayed alive: " + (data.reason || ""));
+          }
+        } catch (e) {
+          console.error("Failed to request shutdown", e);
+        }
+      });
+
+      actions.appendChild(connectBtn);
+      actions.appendChild(disconnectBtn);
+      actions.appendChild(shutdownBtn);
+    }
+
+    item.appendChild(actions);
+
+    connectList.appendChild(item);
+  });
+}
+
+// Initial load
+fetchStatus();
+setInterval(fetchStatus, 2000);
+  </script>
 </body>
 </html>
