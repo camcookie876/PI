@@ -1,43 +1,32 @@
-// ============================================================
-//  CookieArduino v1
-//  Sends joystick movement + click to Camcookie Plugin via USB
-// ============================================================
+// CookieArduino v1 — Arduino UNO joystick to serial
 
-// Joystick pins
 const int VRx = A0;
 const int VRy = A1;
 const int SW  = 2;
 
-// Movement sensitivity
-const int DEADZONE = 50;   // ignore small movements
-const int SCALE = 20;      // how fast the cursor moves
+const int DEADZONE = 50;
+const int SCALE = 60;
 
 void setup() {
   Serial.begin(9600);
-
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
-  pinMode(SW, INPUT_PULLUP);  // joystick button is active LOW
+  pinMode(SW, INPUT_PULLUP);
 }
 
 void loop() {
-  // Read analog joystick
-  int x = analogRead(VRx);  // 0–1023
-  int y = analogRead(VRy);  // 0–1023
+  int x = analogRead(VRx);
+  int y = analogRead(VRy);
 
-  // Convert to centered values
   int dx = x - 512;
   int dy = y - 512;
 
-  // Apply deadzone
   if (abs(dx) < DEADZONE) dx = 0;
   if (abs(dy) < DEADZONE) dy = 0;
 
-  // Scale movement
   dx = dx / SCALE;
   dy = dy / SCALE;
 
-  // If movement exists, send it
   if (dx != 0 || dy != 0) {
     Serial.print("MOVE ");
     Serial.print(dx);
@@ -45,11 +34,10 @@ void loop() {
     Serial.println(dy);
   }
 
-  // Check button press
   if (digitalRead(SW) == LOW) {
     Serial.println("CLICK");
-    delay(200);  // debounce
+    delay(200);
   }
 
-  delay(20);  // smooth updates
+  delay(20);
 }
