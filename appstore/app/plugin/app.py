@@ -4,13 +4,11 @@ import threading
 import serial
 import serial.tools.list_ports
 import uinput
-import webview
 import json
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 import requests
-import sys
 
 # ============================================================
 #  Paths / constants
@@ -22,7 +20,6 @@ APPSTORE_URL = "https://camcookie876.github.io/PI/appstore/appstore.json"
 
 HTTP_HOST = "127.0.0.1"
 HTTP_PORT = 8765
-
 SHUTDOWN_DELAY_SECONDS = 5
 
 
@@ -42,7 +39,6 @@ class MouseController:
         self.device.emit(uinput.REL_Y, dy)
 
     def click(self):
-        # Press + release works on Wayland and X11
         self.device.emit(uinput.BTN_LEFT, 1)
         self.device.emit(uinput.BTN_LEFT, 0)
 
@@ -79,12 +75,22 @@ class BasePlugin:
 
 
 # ============================================================
+#  Shared State
+# ============================================================
+class EngineState:
+    def __init__(self):
+        self.arduino_data = "None"
+
+
+STATE = EngineState()
+
+
+# ============================================================
 #  Arduino Mouse Plugin
 # ============================================================
 class ArduinoMousePlugin(BasePlugin):
-    def __init__(self, manager, ui_api):
+    def __init__(self, manager):
         super().__init__(manager, "arduino_mouse", "Arduino Mouse")
-        self.ui_api = ui_api
         self.running = False
         self.thread = None
         self.serial_port = None
@@ -102,7 +108,6 @@ class ArduinoMousePlugin(BasePlugin):
         port = self.find_arduino()
         if not port:
             self.status = "Arduino not found"
-            self.ui_api.push_state()
             return
 
         try:
@@ -112,11 +117,8 @@ class ArduinoMousePlugin(BasePlugin):
             self.thread.start()
             self.enabled = True
             self.status = f"Connected on {port}"
-            self.ui_api.push_state()
         except Exception as e:
-:
             self.status = f"Error: {e}"
-            self.ui_api.push_state()
 
     def _loop(self):
         while self.running:
@@ -125,8 +127,7 @@ class ArduinoMousePlugin(BasePlugin):
                 if not line:
                     continue
 
-                # Example: "MOVE 1 -2" or "CLICK"
-                self.ui_api.update_arduino_data(line)
+                STATE.arduino_data = line
 
                 parts = line.split()
                 if parts[0] == "MOVE" and len(parts) == 3:
@@ -146,59 +147,48 @@ class ArduinoMousePlugin(BasePlugin):
             self.serial_port.close()
         self.enabled = False
         self.status = "Disabled"
-        self.ui_api.push_state()
 
 
 # ============================================================
 #  LED Plugin (stub, ready for future GPIO)
 # ============================================================
 class LedPlugin(BasePlugin):
-    def __init__(self, manager, ui_api):
+    def __init__(self, manager):
         super().__init__(manager, "led", "LED Controller")
-        self.ui_api = ui_api
         self.led_state = False
 
     def start(self):
         self.enabled = True
         self.status = "Ready (no LEDs configured yet)"
-        self.ui_api.push_state()
 
     def stop(self):
         self.enabled = False
         self.status = "Disabled"
-        self.ui_api.push_state()
 
     def set_led(self, on):
-        # In the future: control GPIO here
         self.led_state = on
         self.status = "LED ON" if on else "LED OFF"
-        self.ui_api.push_state()
 
 
 # ============================================================
 #  Temperature Plugin (stub, ready for future sensor)
 # ============================================================
 class TempPlugin(BasePlugin):
-    def __init__(self, manager, ui_api):
+    def __init__(self, manager):
         super().__init__(manager, "temp", "Temperature Sensor")
-        self.ui_api = ui_api
         self.current_temp = None
 
     def start(self):
         self.enabled = True
         self.status = "Ready (no sensor connected yet)"
-        self.ui_api.push_state()
 
     def stop(self):
         self.enabled = False
         self.status = "Disabled"
-        self.ui_api.push_state()
 
     def read_temp(self):
-        # In the future: read from actual sensor
         self.current_temp = 22.5
         self.status = f"{self.current_temp} °C"
-        self.ui_api.push_state()
         return self.current_temp
 
 
@@ -298,63 +288,8 @@ def count_connected_apps():
 
 
 # ============================================================
-#  UI API (PyWebView bridge: JS <-> Python)
+#  Permission checks
 # ============================================================
-class UI_API:
-    def __init__(self, manager):
-        self.manager = manager
-        self.arduino_data = "None"
-
-    # Called from Python to push state into JS
-    def push_state(self):
-        if window:
-            state = self.get_state()
-            js = f"updateUI({json.dumps(state)})"
-            window.evaluate_js(js)
-
-    # Called by Arduino plugin when new data arrives
-    def update_arduino_data(self, text):
-        self.arduino_data = text
-        self.push_state()
-
-    # === API exposed to JS ===
-    def get_state(self):
-        return {
-            "plugins": self.manager.get_plugins_state(),
-            "arduino_data": self.arduino_data,
-            "connectable_apps": get_connectable_apps()
-        }
-
-    def toggle_plugin(self, plugin_id, enabled):
-        if enabled:
-            self.manager.enable_plugin(plugin_id)
-        else:
-            self.manager.disable_plugin(plugin_id)
-        return self.get_state()
-
-    def connect_app(self, app_id):
-        connected = load_connected_apps()
-        connected[app_id] = True
-        save_connected_apps(connected)
-        return self.get_state()
-
-    def disconnect_app(self, app_id):
-        connected = load_connected_apps()
-        if app_id in connected:
-            connected[app_id] = False
-        save_connected_apps(connected)
-        return self.get_state()
-
-
-# ============================================================
-#  Local HTTP API for other apps (Camcookie Actions, etc.)
-# ============================================================
-plugin_manager = None
-ui_api = None
-window = None
-shutdown_lock = threading.Lock()
-
-
 def app_is_allowed(app_id):
     installed = load_installed_apps()
     if app_id not in installed:
@@ -371,12 +306,18 @@ def app_is_allowed(app_id):
     return bool(connected.get(app_id, False))
 
 
+# ============================================================
+#  HTTP Server
+# ============================================================
+plugin_manager = None
+shutdown_lock = threading.Lock()
+
+
 def schedule_shutdown_if_last():
     def worker():
         time.sleep(SHUTDOWN_DELAY_SECONDS)
         with shutdown_lock:
             if count_connected_apps() == 0:
-                # No more connected apps → exit hard
                 os._exit(0)
     t = threading.Thread(target=worker, daemon=True)
     t.start()
@@ -387,9 +328,19 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
         body = json.dumps(data).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
+        # Allow UI served from file:// to call this API
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        # CORS preflight
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
 
     def _require_app(self, qs):
         app_id = qs.get("app_id", [None])[0]
@@ -403,14 +354,18 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path
         qs = parse_qs(parsed.query)
 
-        # Basic status (no app_id required)
+        # -------- Public status (UI) --------
         if path == "/status":
-            data = ui_api.get_state()
-            data["connected_apps"] = load_connected_apps()
+            data = {
+                "plugins": plugin_manager.get_plugins_state(),
+                "arduino_data": STATE.arduino_data,
+                "connectable_apps": get_connectable_apps(),
+                "connected_apps": load_connected_apps()
+            }
             self._send_json(data)
             return
 
-        # Connect
+        # -------- Connect / Disconnect / Shutdown (by apps) --------
         if path == "/connect":
             app_id = self._require_app(qs)
             if not app_id:
@@ -421,7 +376,6 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "connected": connected})
             return
 
-        # Disconnect
         if path == "/disconnect":
             app_id = self._require_app(qs)
             if not app_id:
@@ -435,7 +389,6 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "connected": connected})
             return
 
-        # Shutdown request
         if path == "/shutdown":
             app_id = self._require_app(qs)
             if not app_id:
@@ -448,16 +401,38 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
                 schedule_shutdown_if_last()
                 self._send_json({"ok": True, "shutting_down": True})
             else:
-                self._send_json({"ok": True, "shutting_down": False, "reason": "Other apps still connected"})
+                self._send_json(
+                    {"ok": True, "shutting_down": False, "reason": "Other apps still connected"}
+                )
             return
 
-        # From here on, require app_id + permission
+        # -------- Plugin toggle (UI) --------
+        if path == "/plugin/toggle":
+            pid = qs.get("id", [None])[0]
+            enabled_str = qs.get("enabled", ["0"])[0]
+            if not pid:
+                self._send_json({"ok": False, "error": "Missing id"}, code=400)
+                return
+            enabled = enabled_str == "1"
+            if enabled:
+                plugin_manager.enable_plugin(pid)
+            else:
+                plugin_manager.disable_plugin(pid)
+            data = {
+                "plugins": plugin_manager.get_plugins_state(),
+                "arduino_data": STATE.arduino_data,
+                "connectable_apps": get_connectable_apps(),
+                "connected_apps": load_connected_apps()
+            }
+            self._send_json({"ok": True, "state": data})
+            return
+
+        # -------- Protected endpoints (need app_id + permission) --------
         app_id = qs.get("app_id", [None])[0]
         if app_id is None or not app_is_allowed(app_id):
             self._send_json({"ok": False, "error": "Access denied or app not connected"}, code=403)
             return
 
-        # /mouse/move?dx=..&dy=..
         if path == "/mouse/move":
             try:
                 dx = int(qs.get("dx", [0])[0])
@@ -470,7 +445,6 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": str(e)}, code=400)
             return
 
-        # /mouse/click
         if path == "/mouse/click":
             try:
                 MOUSE.click()
@@ -479,7 +453,6 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": str(e)}, code=400)
             return
 
-        # /led/set?on=1
         if path == "/led/set":
             led = plugin_manager.get_plugin("led")
             if not led:
@@ -490,7 +463,6 @@ class CamcookieRequestHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True})
             return
 
-        # /temp/read
         if path == "/temp/read":
             temp = plugin_manager.get_plugin("temp")
             if not temp:
@@ -514,15 +486,13 @@ def start_http_server():
 #  Main
 # ============================================================
 def main():
-    global plugin_manager, ui_api, window
+    global plugin_manager
 
     plugin_manager = PluginManager()
-    ui_api = UI_API(plugin_manager)
 
-    # Register plugins
-    arduino_mouse = ArduinoMousePlugin(plugin_manager, ui_api)
-    led_plugin = LedPlugin(plugin_manager, ui_api)
-    temp_plugin = TempPlugin(plugin_manager, ui_api)
+    arduino_mouse = ArduinoMousePlugin(plugin_manager)
+    led_plugin = LedPlugin(plugin_manager)
+    temp_plugin = TempPlugin(plugin_manager)
 
     plugin_manager.register(arduino_mouse)
     plugin_manager.register(led_plugin)
@@ -530,15 +500,12 @@ def main():
 
     http_server = start_http_server()
 
-    html_path = os.path.join(os.path.dirname(__file__), "web", "index.html")
-    window = webview.create_window(
-        "Camcookie Plugin V1.4 BETA",
-        html_path,
-        width=800,
-        height=520,
-        js_api=ui_api
-    )
-    webview.start()
+    # Backend just runs; UI is Chromium pointing to web/index.html
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
     http_server.shutdown()
     for p in plugin_manager.plugins.values():

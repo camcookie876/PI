@@ -109,7 +109,7 @@
     "rm -f $HOME/.local/share/applications/camcookieplugin.desktop"
   ],
   "launch": "python3 $HOME/camcookieplugin/app.py",
-  "version": "1.4",
+  "version": "1.5",
   "files": [],
   "plugin": "NO"
 }
