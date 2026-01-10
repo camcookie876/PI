@@ -24,7 +24,7 @@
   "name": "Camcookie Actions",
   "creator": "Camcookie INC",
   "description": "Local action engine and controller UI for Raspberry Pi OS. Integrates with the Camcookie Plugin Engine for LED, mouse, and temperature control. Includes full web UI, controller, and voice-text command support.",
-  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/actions.png",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/camcookieactions.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-venv wget unzip",
