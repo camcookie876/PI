@@ -1,0 +1,31 @@
+{
+  "lamp_on": {
+    "command": "turn on lamp",
+    "kind": "plugin_led",
+    "on": 1,
+    "description": "Turns on LED"
+  },
+  "lamp_off": {
+    "command": "turn off lamp",
+    "kind": "plugin_led",
+    "on": 0,
+    "description": "Turns off LED"
+  },
+  "nudge_mouse": {
+    "command": "nudge mouse",
+    "kind": "plugin_mouse_move",
+    "dx": 10,
+    "dy": -5,
+    "description": "Moves mouse slightly"
+  },
+  "mouse_click": {
+    "command": "mouse click",
+    "kind": "plugin_mouse_click",
+    "description": "Clicks mouse"
+  },
+  "read_temp": {
+    "command": "read temperature",
+    "kind": "plugin_temp",
+    "description": "Reads temperature"
+  }
+}

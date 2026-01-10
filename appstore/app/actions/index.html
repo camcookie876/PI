@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Camcookie Actions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { background:#050814; color:white; font-family:sans-serif; margin:0; padding:0; }
+.top { padding:12px; background:#0d1220; display:flex; justify-content:space-between; }
+.tabs { display:flex; background:#0d1220; }
+.tab { flex:1; padding:10px; text-align:center; cursor:pointer; color:#8a92b2; }
+.tab.active { background:#1a2035; color:#ffb400; }
+.screen { display:none; padding:12px; }
+.screen.active { display:block; }
+.btn { padding:10px 14px; background:#ffb400; border-radius:8px; border:none; margin:4px; cursor:pointer; }
+.card { background:#111729; padding:12px; border-radius:12px; margin-bottom:12px; }
+.input { width:100%; padding:10px; border-radius:8px; border:none; margin-top:6px; }
+.action-item { background:#0f1525; padding:10px; border-radius:8px; margin-bottom:6px; }
+.controller-grid { display:flex; gap:10px; }
+.ctrl-btn { padding:14px; background:#1a2035; border-radius:10px; margin:4px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>Camcookie Actions</div>
+  <div id="status">Online</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-s="home">Home</div>
+  <div class="tab" data-s="actions">Actions</div>
+  <div class="tab" data-s="controller">Controller</div>
+  <div class="tab" data-s="status">Status</div>
+</div>
+
+<div id="home" class="screen active">
+  <div class="card">
+    <div>Quick Controls</div>
+    <button class="btn" onclick="run('lamp_on')">Lamp On</button>
+    <button class="btn" onclick="run('lamp_off')">Lamp Off</button>
+    <button class="btn" onclick="run('nudge_mouse')">Nudge Mouse</button>
+    <button class="btn" onclick="run('mouse_click')">Mouse Click</button>
+    <button class="btn" onclick="run('read_temp')">Read Temp</button>
+  </div>
+
+  <div class="card">
+    <div>Voice Command</div>
+    <input id="voice" class="input" placeholder="Say something">
+    <button class="btn" onclick="sendVoice()">Send</button>
+    <div id="voice-out"></div>
+  </div>
+</div>
+
+<div id="actions" class="screen">
+  <div class="card">
+    <div>Actions</div>
+    <div id="actions-list"></div>
+  </div>
+</div>
+
+<div id="controller" class="screen">
+  <div class="card">
+    <div>Controller</div>
+    <div class="controller-grid">
+      <button class="ctrl-btn" onclick="controller('UP')">UP</button>
+      <button class="ctrl-btn" onclick="controller('DOWN')">DOWN</button>
+      <button class="ctrl-btn" onclick="controller('LEFT')">LEFT</button>
+      <button class="ctrl-btn" onclick="controller('RIGHT')">RIGHT</button>
+      <button class="ctrl-btn" onclick="controller('A')">A</button>
+      <button class="ctrl-btn" onclick="controller('B')">B</button>
+      <button class="ctrl-btn" onclick="controller('X')">X</button>
+      <button class="ctrl-btn" onclick="controller('Y')">Y</button>
+    </div>
+  </div>
+</div>
+
+<div id="status" class="screen">
+  <div class="card">
+    <div>System State</div>
+    <pre id="state"></pre>
+  </div>
+</div>
+
+<script>
+function tab(t){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"))
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"))
+  document.querySelector(`.tab[data-s="${t}"]`).classList.add("active")
+  document.getElementById(t).classList.add("active")
+}
+
+document.querySelectorAll(".tab").forEach(x=>{
+  x.onclick=()=>tab(x.dataset.s)
+})
+
+async function run(id){
+  await fetch(`/api/run/${id}`,{method:"POST"})
+  loadState()
+}
+
+async function sendVoice(){
+  let t=document.getElementById("voice").value
+  let r=await fetch("/api/voice",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t})})
+  let j=await r.json()
+  document.getElementById("voice-out").innerText="Matched: "+j.matched
+  loadState()
+}
+
+async function controller(btn){
+  await fetch("/api/controller/button",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({button:btn})})
+  loadState()
+}
+
+async function loadActions(){
+  let r=await fetch("/api/actions")
+  let j=await r.json()
+  let out=""
+  for(let k in j){
+    out+=`<div class="action-item">${k} — ${j[k].description}</div>`
+  }
+  document.getElementById("actions-list").innerHTML=out
+}
+
+async function loadState(){
+  let r=await fetch("/api/state")
+  let j=await r.json()
+  document.getElementById("state").innerText=JSON.stringify(j,null,2)
+}
+
+loadActions()
+loadState()
+setInterval(loadState,2000)
+</script>
+
+</body>
+</html>

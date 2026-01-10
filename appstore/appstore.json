@@ -34,8 +34,8 @@
         "mkdir -p $HOME/camcookie-actions/models",
         "cd $HOME/camcookie-actions/models && wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
         "cd $HOME/camcookie-actions/models && unzip -o vosk-model-small-en-us-0.15.zip",
-        "wget https://camcookie876.github.io/PI/appstore/app/camcookieactions/actions.json -O $HOME/camcookie-actions/actions.json",
-        "wget https://camcookie876.github.io/PI/appstore/app/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
+        "wget https://camcookie876.github.io/PI/appstore/app/actions/actions.json -O $HOME/camcookie-actions/actions.json",
+        "wget https://camcookie876.github.io/PI/appstore/app/actions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
         "chmod +x $HOME/camcookie-actions/camcookie_actions.py"
       ],
       "uninstall": [
