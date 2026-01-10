@@ -79,7 +79,7 @@
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
   "description": "Camcookie Plugin V1.5 — Shared hardware engine with virtual mouse, Arduino support, LED and temperature plugins, Chromium-based HTML UI, and app connection permissions.",
-  "icon": "https://camcookie876.github.io/PI/appstore/icons/plugin.png",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/plugin.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-serial python3-uinput python3-requests chromium",
