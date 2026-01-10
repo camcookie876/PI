@@ -37,8 +37,10 @@ body {
 }
 
 .nav-link {
+  background: none;
+  border: none;
   color: #fff;
-  text-decoration: none;
+  cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 14px;
