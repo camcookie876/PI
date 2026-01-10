@@ -597,7 +597,7 @@ def populate_home():
 
     subtitle = tk.Label(
         home_frame,
-        text="Featured apps, recent updates, and tools built for Camcookie OS.",
+        text="Featured apps, recent updates, and tools built for Raspberry PI OS.",
         font=("Arial", 11),
         bg=bg,
         fg=fg_sub
