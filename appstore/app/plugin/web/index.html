@@ -1,25 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Camcookie Plugin</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Camcookie Plugin V1.4 BETA</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="topnav">
+    <h1>Camcookie Plugin <span class="beta">V1.4 BETA</span></h1>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-tab="home">Home</a>
+      <a href="#" class="nav-link" data-tab="plugins">Plugins</a>
+      <a href="#" class="nav-link" data-tab="connect">Connect</a>
+    </div>
+  </div>
 
-<div class="topnav">
-  <h1>Camcookie Plugin <span class="beta">Beta</span></h1>
-  <a class="active">Home</a>
-  <a>Connect</a>
-</div>
+  <div id="tab-home" class="tab active">
+    <h2 id="plugin-count">You currently have 0 plugins running</h2>
+    <div class="card">
+      <h3>Arduino Input</h3>
+      <p>Current command input: <span id="arduino-data">None</span></p>
+    </div>
+  </div>
 
-<h2 id="plugin-count">You currently have 1 plugin running</h2>
+  <div id="tab-plugins" class="tab">
+    <h2>Plugins</h2>
+    <div id="plugin-list"></div>
+  </div>
 
-<div class="card">
-  <h3>Arduino Input</h3>
-  <p id="arduino-data">Waiting...</p>
-</div>
+  <div id="tab-connect" class="tab">
+    <h2>Connect Apps</h2>
+    <p>
+      These apps support Camcookie Plugins and are installed on your system.
+      Connect them to let them use the shared hardware engine.
+    </p>
+    <div id="connect-app-list"></div>
 
-<script src="app.js"></script>
+    <div class="card">
+      <h3>API base URL</h3>
+      <p><code>http://127.0.0.1:8765</code></p>
+      <p>Apps should include <code>?app_id=yourappid</code> on protected endpoints.</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

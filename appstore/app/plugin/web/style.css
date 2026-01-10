@@ -8,25 +8,143 @@ body {
 
 .topnav {
   background-color: #f99900;
-  padding: 10px;
+  padding: 10px 16px;
   border-radius: 10px;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .topnav h1 {
   margin: 0;
   color: white;
+  font-size: 22px;
 }
 
 .beta {
-  font-size: 14px;
-  margin-left: 10px;
+  font-size: 12px;
+  margin-left: 8px;
   color: #333;
+  background: #ffdd88;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.nav-link.active {
+  background-color: #04aa6d;
+}
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
 }
 
 .card {
   background: #1f3b5b;
   padding: 16px;
   border-radius: 12px;
-  margin-top: 20px;
+  margin-top: 16px;
+}
+
+#plugin-list .plugin-item,
+#connect-app-list .connect-app {
+  background: #123456;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plugin-info,
+.connect-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.plugin-name,
+.connect-name {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.plugin-status,
+.connect-status {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.plugin-toggle input {
+  width: 20px;
+  height: 20px;
+}
+
+.connect-actions button {
+  margin-left: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.connect-actions button.connect-btn {
+  background: #04aa6d;
+  color: white;
+}
+
+.connect-actions button.disconnect-btn {
+  background: #e11d48;
+  color: white;
+}
+
+.connect-actions button.shutdown-btn {
+  background: #f97316;
+  color: white;
+}
+
+.connect-status span.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.badge-installed {
+  background: #16a34a;
+}
+
+.badge-not-installed {
+  background: #9ca3af;
+}
+
+.badge-connected {
+  background: #22c55e;
+}
+
+.badge-disconnected {
+  background: #6b7280;
 }

@@ -78,17 +78,25 @@
   "id": "camcookieplugin",
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
-  "description": "Wayland-safe Camcookie hardware engine. Uses a virtual mouse (uinput), supports GPIO joystick and Arduino UNO over serial, with a styled UI.",
+  "description": "Camcookie Plugin V1.4 BETA — Shared hardware engine with Arduino mouse, LED and temperature plugins, HTML UI, background service mode, and app connection permissions.",
   "icon": "https://camcookie876.github.io/PI/appstore/icons/plugin.png",
   "install": [
     "sudo apt update",
-    "sudo apt install -y python3 python3-tk python3-serial python3-rpi.gpio python3-uinput",
+    "sudo apt install -y python3 python3-pip python3-serial python3-uinput python3-requests",
+    "python3 -m pip install --user pywebview",
     "sudo bash -c 'echo \"uinput\" > /etc/modules-load.d/uinput.conf'",
     "sudo bash -c 'echo \"KERNEL==\\\"uinput\\\", MODE=\\\"0660\\\", GROUP=\\\"input\\\"\" > /etc/udev/rules.d/99-uinput.rules'",
     "sudo usermod -aG input $USER",
-    "mkdir -p $HOME/camcookieplugin",
+
+    "mkdir -p $HOME/camcookieplugin/web",
+
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
+    "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/index.html -O $HOME/camcookieplugin/web/index.html",
+    "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/style.css -O $HOME/camcookieplugin/web/style.css",
+    "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/app.js -O $HOME/camcookieplugin/web/app.js",
+
     "chmod +x $HOME/camcookieplugin/app.py",
+
     "echo '[Desktop Entry]' > $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Type=Application' >> $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Name=Camcookie Plugin' >> $HOME/.local/share/applications/camcookieplugin.desktop",
