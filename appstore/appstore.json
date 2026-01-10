@@ -93,8 +93,6 @@
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/start.sh -O $HOME/camcookieplugin/start.sh",
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/index.html -O $HOME/camcookieplugin/web/index.html",
-    "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/style.css -O $HOME/camcookieplugin/web/style.css",
-    "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/app.js -O $HOME/camcookieplugin/web/app.js",
 
     "chmod +x $HOME/camcookieplugin/app.py",
     "chmod +x $HOME/camcookieplugin/start.sh",
