@@ -5,9 +5,9 @@
       "name": "Camcookie App Store",
       "creator": "Camcookie INC",
       "description": "The Camcookie Appstore",
-      "icon": "https://camcookie876.github.io/app/appstore/app/icons/",
+      "icon": "https://camcookie876.github.io/PI/appstore/app/icons/",
       "install": [
-        "curl -sSL https://camcookie876.github.io/app/appstore/install-appstore.sh | bash"
+        "curl -sSL https://camcookie876.github.io/PI/appstore/install-appstore.sh | bash"
       ],
       "uninstall": [
         "rm -f $HOME/camcookie-appstore.py",
@@ -23,7 +23,7 @@
       "name": "Camcookie Actions",
       "creator": "Camcookie INC",
       "description": "Offline voice assistant for Raspberry Pi OS. Uses Vosk, pyttsx3, and PyAutoGUI for real offline control. More infromation at https://github.com/camcookie876/PY-M/tree/main/camcookie-for-pi/actions#-camcookie-actions",
-      "icon": "https://camcookie876.github.io/app/appstore/app/icons/",
+      "icon": "https://camcookie876.github.io/PI/appstore/app/icons/",
       "install": [
         "sudo apt update && sudo apt full-upgrade -y",
         "sudo apt install -y python3-full python3-venv python3-pip portaudio19-dev ffmpeg scrot unzip wget espeak-ng",
@@ -33,8 +33,8 @@
         "mkdir -p $HOME/camcookie-actions/models",
         "cd $HOME/camcookie-actions/models && wget https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
         "cd $HOME/camcookie-actions/models && unzip -o vosk-model-small-en-us-0.15.zip",
-        "wget https://camcookie876.github.io/app/appstore/app/camcookieactions/actions.json -O $HOME/camcookie-actions/actions.json",
-        "wget https://camcookie876.github.io/app/appstore/app/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
+        "wget https://camcookie876.github.io/PI/appstore/app/camcookieactions/actions.json -O $HOME/camcookie-actions/actions.json",
+        "wget https://camcookie876.github.io/PI/appstore/app/camcookieactions/camcookie_actions.py -O $HOME/camcookie-actions/camcookie_actions.py",
         "chmod +x $HOME/camcookie-actions/camcookie_actions.py"
       ],
       "uninstall": [
@@ -49,12 +49,12 @@
   "name": "Python Maker",
   "creator": "Camcookie INC",
   "description": "A simple Raspberry Pi Python editor and runner. Write Python code, run it, and see output instantly.",
-  "icon": "https://camcookie876.github.io/app/appstore/app/icons/pythonmaker.png",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/pythonmaker.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk",
     "mkdir -p $HOME/pythonmaker",
-    "wget https://camcookie876.github.io/app/appstore/app/pythonmaker/pythonmaker.py -O $HOME/pythonmaker/pythonmaker.py",
+    "wget https://camcookie876.github.io/PI/appstore/app/pythonmaker/pythonmaker.py -O $HOME/pythonmaker/pythonmaker.py",
     "chmod +x $HOME/pythonmaker/pythonmaker.py",
     "echo '[Desktop Entry]' > $HOME/.local/share/applications/pythonmaker.desktop",
     "echo 'Type=Application' >> $HOME/.local/share/applications/pythonmaker.desktop",
@@ -76,12 +76,12 @@
   "name": "Camcookie Plugin",
   "creator": "Camcookie INC",
   "description": "The official Camcookie hardware engine. Includes joystick control, Arduino serial support, GPIO plugins, and a styled UI with live plugin status.",
-  "icon": "https://camcookie876.github.io/app/appstore/app/icons/plugin.png",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/plugin.png",
   "install": [
     "sudo apt update",
     "sudo apt install -y python3 python3-pip python3-tk xdotool python3-serial",
     "mkdir -p $HOME/camcookieplugin",
-    "wget https://camcookie876.github.io/app/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
+    "wget https://camcookie876.github.io/PI/appstore/app/plugin/app.py -O $HOME/camcookieplugin/app.py",
     "chmod +x $HOME/camcookieplugin/app.py",
     "echo '[Desktop Entry]' > $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Type=Application' >> $HOME/.local/share/applications/camcookieplugin.desktop",

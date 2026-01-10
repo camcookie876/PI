@@ -9,7 +9,7 @@ mkdir -p "$HOME_DIR/.camcookie/icons"
 mkdir -p "$HOME_DIR/.local/share/applications"
 
 # Download latest Appstore V12 script
-wget https://camcookie876.github.io/app/appstore/camcookie-appstore.py -O "$HOME_DIR/camcookie-appstore.py"
+wget https://camcookie876.github.io/PI/appstore/camcookie-appstore.py -O "$HOME_DIR/camcookie-appstore.py"
 
 # Make executable
 chmod +x "$HOME_DIR/camcookie-appstore.py"
