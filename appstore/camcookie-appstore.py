@@ -13,7 +13,7 @@ import re
 # Basic config and paths
 # =========================
 
-APPSTORE_URL = "https://camcookie876.github.io/app/appstore/appstore.json"
+APPSTORE_URL = "https://camcookie876.github.io/PI/appstore/appstore.json"
 
 HOME = os.path.expanduser("~")
 LOCAL_DB = os.path.join(HOME, ".camcookie_installed.json")
