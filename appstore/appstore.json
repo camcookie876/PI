@@ -94,6 +94,8 @@
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/start.sh -O $HOME/camcookieplugin/start.sh",
     "wget https://camcookie876.github.io/PI/appstore/app/plugin/web/index.html -O $HOME/camcookieplugin/web/index.html",
 
+    "wget https://camcookie876.github.io/PI/appstore/app/icons/plugin.png -O $HOME/camcookieplugin/icon.png",
+
     "chmod +x $HOME/camcookieplugin/app.py",
     "chmod +x $HOME/camcookieplugin/start.sh",
 
@@ -101,6 +103,7 @@
     "echo 'Type=Application' >> $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Name=Camcookie Plugin' >> $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Exec=$HOME/camcookieplugin/start.sh' >> $HOME/.local/share/applications/camcookieplugin.desktop",
+    "echo 'Icon=$HOME/camcookieplugin/icon.png' >> $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Terminal=false' >> $HOME/.local/share/applications/camcookieplugin.desktop",
     "echo 'Categories=Utility;' >> $HOME/.local/share/applications/camcookieplugin.desktop"
   ],
