@@ -1,0 +1,63 @@
+{
+  "themeName": "Camcookie Blue",
+  "author": "Camcookie INC",
+  "version": "1.0",
+
+  "metadata": {
+    "description": "Official Camcookie theme with blue accents and soft glow UI.",
+    "tags": ["official", "blue", "clean"],
+    "previewImage": "https://camcookie876.github.io/PI/camcookie_theme/previews/camcookie-blue.png"
+  },
+
+  "appearance": {
+    "accentColor": "#3b82f6",
+    "backgroundColor": "#0b1020",
+    "textColor": "#f5f5f5",
+    "fontFamily": "system-ui",
+    "fontScale": 1.0,
+    "cornerRadius": 10,
+    "transparency": 0.12,
+    "blur": true,
+    "shadows": true,
+    "iconPack": "BASE64_CAMCOOKIE_BLUE_ICONS"
+  },
+
+  "wallpapers": {
+    "desktop": "BASE64_CAMCOOKIE_BLUE_WALLPAPER"
+  },
+
+  "notifications": {
+    "background": "BASE64_CAMCOOKIE_NOTIFICATION_BG",
+    "sound": "BASE64_CAMCOOKIE_NOTIFICATION_SOUND",
+    "position": "top-right",
+    "animation": "fade",
+    "duration": 4500
+  },
+
+  "sounds": {
+    "boot": "BASE64_CAMCOOKIE_BOOT",
+    "shutdown": "BASE64_CAMCOOKIE_SHUTDOWN",
+    "click": "BASE64_CAMCOOKIE_CLICK",
+    "error": "BASE64_CAMCOOKIE_ERROR"
+  },
+
+  "windowManager": {
+    "titlebarStyle": "standard",
+    "buttonStyle": "round",
+    "borderWidth": 1,
+    "borderColor": "#3b82f6",
+    "animations": {
+      "open": "fade",
+      "close": "fade",
+      "minimize": "slide-down"
+    }
+  },
+
+  "terminal": {
+    "background": "#050814",
+    "foreground": "#c7d2fe",
+    "cursorColor": "#ffffff",
+    "fontFamily": "FiraCode",
+    "fontSize": 13
+  }
+}

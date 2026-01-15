@@ -1,0 +1,65 @@
+{
+  "themeName": "Dark Neon",
+  "author": "Community",
+  "version": "1.2",
+
+  "metadata": {
+    "description": "Dark Neon with animated notification video and refined accent colors.",
+    "tags": ["dark", "neon", "glow", "animated"],
+    "previewImage": "https://camcookie876.github.io/PI/camcookie_theme/previews/dark-neon.png"
+  },
+
+  "appearance": {
+    "accentColor": "#22d3ee",
+    "backgroundColor": "#020617",
+    "textColor": "#e5e7eb",
+    "fontFamily": "system-ui",
+    "fontScale": 1.0,
+    "cornerRadius": 10,
+    "transparency": 0.2,
+    "blur": true,
+    "shadows": true,
+    "iconPack": "BASE64_DARK_NEON_ICONS_V2"
+  },
+
+  "wallpapers": {
+    "desktop": "BASE64_DARK_NEON_WALLPAPER",
+    "lockscreen": "BASE64_DARK_NEON_LOCKSCREEN"
+  },
+
+  "notifications": {
+    "background": "BASE64_DARK_NEON_NOTIFICATION_BG",
+    "sound": "BASE64_DARK_NEON_NOTIFICATION_SOUND",
+    "position": "bottom-right",
+    "animation": "slide",
+    "duration": 5000,
+    "video": "BASE64_DARK_NEON_NOTIFICATION_VIDEO"
+  },
+
+  "sounds": {
+    "boot": "BASE64_DARK_NEON_BOOT",
+    "shutdown": "BASE64_DARK_NEON_SHUTDOWN",
+    "click": "BASE64_DARK_NEON_CLICK",
+    "error": "BASE64_DARK_NEON_ERROR"
+  },
+
+  "windowManager": {
+    "titlebarStyle": "minimal",
+    "buttonStyle": "square",
+    "borderWidth": 2,
+    "borderColor": "#22d3ee",
+    "animations": {
+      "open": "zoom-in",
+      "close": "zoom-out",
+      "minimize": "slide-down"
+    }
+  },
+
+  "terminal": {
+    "background": "#020617",
+    "foreground": "#22d3ee",
+    "cursorColor": "#ffffff",
+    "fontFamily": "FiraCode",
+    "fontSize": 13
+  }
+}

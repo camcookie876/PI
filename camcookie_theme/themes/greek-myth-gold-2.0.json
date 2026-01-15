@@ -1,0 +1,76 @@
+{
+  "themeName": "Greek Myth Gold",
+  "author": "Camden",
+  "version": "2.0",
+
+  "metadata": {
+    "description": "CUT 2.0 upgrade with window manager styles, terminal theme, and app overrides.",
+    "tags": ["gold", "myth", "cinzel", "advanced"],
+    "previewImage": "https://camcookie876.github.io/PI/camcookie_theme/previews/greek-myth-gold.png"
+  },
+
+  "appearance": {
+    "accentColor": "#d4af37",
+    "backgroundColor": "#080808",
+    "textColor": "#f8f3e7",
+    "fontFamily": "Cinzel",
+    "fontScale": 1.05,
+    "cornerRadius": 16,
+    "transparency": 0.15,
+    "blur": true,
+    "shadows": true,
+    "iconPack": "BASE64_ICON_PACK_DATA_V3"
+  },
+
+  "wallpapers": {
+    "desktop": "BASE64_PARCHMENT_WALLPAPER",
+    "lockscreen": "BASE64_LOCKSCREEN_PARCHMENT",
+    "loginScreen": "BASE64_LOGIN_PARCHMENT"
+  },
+
+  "notifications": {
+    "background": "BASE64_NOTIFICATION_PARCHMENT",
+    "sound": "BASE64_NOTIFICATION_SOUND",
+    "position": "top-right",
+    "animation": "slide",
+    "duration": 5000,
+    "video": "BASE64_NOTIFICATION_VIDEO"
+  },
+
+  "sounds": {
+    "boot": "BASE64_BOOT_SOUND",
+    "shutdown": "BASE64_SHUTDOWN_SOUND",
+    "click": "BASE64_CLICK_SOUND",
+    "error": "BASE64_ERROR_SOUND"
+  },
+
+  "windowManager": {
+    "titlebarStyle": "minimal",
+    "buttonStyle": "round",
+    "borderWidth": 2,
+    "borderColor": "#d4af37",
+    "animations": {
+      "open": "fade",
+      "close": "zoom-out",
+      "minimize": "slide-down"
+    }
+  },
+
+  "terminal": {
+    "background": "#050505",
+    "foreground": "#d4af37",
+    "cursorColor": "#ffffff",
+    "fontFamily": "FiraCode",
+    "fontSize": 14
+  },
+
+  "apps": {
+    "camcookie-actions": {
+      "accentColor": "#ffcc66",
+      "iconOverride": "BASE64_ACTIONS_ICON"
+    },
+    "camcookie-store": {
+      "background": "#15110b"
+    }
+  }
+}
