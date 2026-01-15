@@ -1,36 +1,21 @@
 #!/bin/bash
 
-echo "🍪 Installing Camcookie Control Center..."
+echo "🍪 Installing Camcookie (Python-only)..."
 
-# Folders
-mkdir -p $HOME/camcookie/control-center/ui
-mkdir -p $HOME/camcookie/control-center/backend
+sudo apt update
+sudo apt install -y python3 python3-pip python3-tk xdg-utils
+
 mkdir -p $HOME/camcookie/theme-engine
 mkdir -p $HOME/camcookie/theme-wallpapers
 mkdir -p $HOME/camcookie/theme-sounds
 mkdir -p $HOME/camcookie/theme-icons
 mkdir -p $HOME/camcookie/theme-videos
 mkdir -p $HOME/camcookie/themestore/versions
-
-sudo apt update
-sudo apt install -y python3 python3-pip xdg-utils
+mkdir -p $HOME/camcookie/control-center
 
 # Download Python app
 wget -O $HOME/camcookie/control-center/app.py \
 https://camcookie876.github.io/PI/camcookie_theme/code/app.py
-
-# Download UI
-wget -O $HOME/camcookie/control-center/ui/index.html \
-https://camcookie876.github.io/PI/camcookie_theme/ui/index.html
-
-wget -O $HOME/camcookie/control-center/ui/style.css \
-https://camcookie876.github.io/PI/camcookie_theme/ui/style.css
-
-wget -O $HOME/camcookie/control-center/ui/app.js \
-https://camcookie876.github.io/PI/camcookie_theme/ui/app.js
-
-wget -O $HOME/camcookie/control-center/ui/icon.png \
-https://camcookie876.github.io/PI/appstore/app/icons/camcookie-themes.png
 
 # Download theme engine
 wget -O $HOME/camcookie/theme-engine/import_theme.py \
@@ -56,7 +41,7 @@ cat > $HOME/.local/share/applications/camcookiethemes.desktop << EOF
 Type=Application
 Name=Camcookie Themes
 Exec=/home/pi/camcookie/control-center/launch.sh
-Icon=/home/pi/camcookie/control-center/ui/icon.png
+Icon=/home/pi/camcookie/control-center/icon.png
 Terminal=false
 Categories=Settings;
 EOF
