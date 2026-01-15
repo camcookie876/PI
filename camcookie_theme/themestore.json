@@ -1,0 +1,64 @@
+{
+  "themestoreVersion": "1.0",
+  "themes": [
+    {
+      "id": "greek-myth-gold",
+      "name": "Greek Myth Gold",
+      "creator": "Camden",
+      "description": "A golden Greek‑myth inspired CUT theme with parchment textures, Cinzel fonts, gold accents, and custom notification video.",
+      "tags": ["gold", "myth", "cinzel", "premium"],
+      "preview": "https://camcookie876.github.io/PI/camcookie_theme/previews/greek-myth-gold.png",
+
+      "versions": {
+        "1.0": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/greek-myth-gold-1.0.json",
+          "notes": "Initial release with wallpapers, icons, sounds, and notification video."
+        },
+        "1.1": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/greek-myth-gold-1.1.json",
+          "notes": "Improved icon pack and added lockscreen wallpaper."
+        },
+        "2.0": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/greek-myth-gold-2.0.json",
+          "notes": "CUT 2.0 upgrade: added window manager styles, terminal theme, and app overrides."
+        }
+      }
+    },
+
+    {
+      "id": "camcookie-blue",
+      "name": "Camcookie Blue",
+      "creator": "Camcookie INC",
+      "description": "The official Camcookie OS theme with blue accents, soft glow UI, and smooth notification animations.",
+      "tags": ["official", "blue", "clean"],
+      "preview": "https://camcookie876.github.io/PI/camcookie_theme/previews/camcookie-blue.png",
+
+      "versions": {
+        "1.0": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/camcookie-blue-1.0.json",
+          "notes": "Official Camcookie theme release."
+        }
+      }
+    },
+
+    {
+      "id": "dark-neon",
+      "name": "Dark Neon",
+      "creator": "Community",
+      "description": "A high‑contrast neon theme with glowing borders, animated notification video, and neon‑blue terminal.",
+      "tags": ["dark", "neon", "glow"],
+      "preview": "https://camcookie876.github.io/PI/camcookie_theme/previews/dark-neon.png",
+
+      "versions": {
+        "1.0": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/dark-neon-1.0.json",
+          "notes": "Initial neon release."
+        },
+        "1.2": {
+          "url": "https://camcookie876.github.io/PI/camcookie_theme/themes/dark-neon-1.2.json",
+          "notes": "Added animated notification video and improved accent colors."
+        }
+      }
+    }
+  ]
+}

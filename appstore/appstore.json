@@ -115,6 +115,42 @@
   "version": "1.5",
   "files": [],
   "plugin": "NO"
+},
+{
+  "id": "camcookie-control-center",
+  "name": "Camcookie Control Center",
+  "creator": "Camcookie INC",
+  "description": "The full Camcookie Control Center for Raspberry Pi. Includes Appearance settings, Notifications, Themes, ThemeStore, Accessories, and full system customization. Supports CUT themes with images, sounds, videos, and 50+ customization options.",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/camcookie-control.png",
+  "version": "1.0",
+  "plugin": "YES",
+  "themestore": "https://camcookie876.github.io/PI/camcookie_theme/themestore.json",
+
+  "install": [
+    "wget -O $HOME/camcookie-install.sh https://camcookie876.github.io/PI/camcookie_theme/camcookie-install.sh",
+    "chmod +x $HOME/camcookie-install.sh",
+    "$HOME/camcookie-install.sh"
+  ],
+
+  "uninstall": [
+    "rm -rf $HOME/camcookie/control-center",
+    "rm -rf $HOME/camcookie/theme-engine",
+    "rm -rf $HOME/camcookie/theme-wallpapers",
+    "rm -rf $HOME/camcookie/theme-videos",
+    "rm -rf $HOME/camcookie/theme-sounds",
+    "rm -rf $HOME/camcookie/theme-icons",
+    "rm -rf $HOME/camcookie/themestore",
+    "sed -i '/camcookie-import/d' ~/.bashrc",
+    "sed -i '/camcookie-control/d' ~/.bashrc"
+  ],
+
+  "launch": "bash $HOME/camcookie/control-center/launch.sh",
+
+  "files": [
+    "$HOME/camcookie/control-center",
+    "$HOME/camcookie/theme-engine",
+    "$HOME/camcookie/themestore"
+  ]
 }
   ]
 }
