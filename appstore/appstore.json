@@ -120,34 +120,21 @@
   "id": "camcookiethemes",
   "name": "Camcookie Themes",
   "creator": "Camcookie INC",
-  "description": "Camcookie Themes — Full CUT (Camcookie Ultra Theme) engine with ThemeStore support, theme importing, wallpapers, sounds, notification videos, icon packs, and complete system customization.",
+  "description": "Camcookie Themes — CUT theme engine with ThemeStore, wallpapers, sounds, notification videos, and full system styling. Uses your default browser (no Chromium required).",
   "icon": "https://camcookie876.github.io/PI/appstore/app/icons/camcookie-themes.png",
-
   "install": [
     "sudo apt update",
-    "sudo apt install -y python3 python3-pip omxplayer chromium-browser",
-
+    "sudo apt install -y python3 python3-pip omxplayer xdg-utils",
     "wget -O $HOME/camcookie-download.sh https://camcookie876.github.io/PI/camcookie_theme/download/camcookie-download.sh",
     "chmod +x $HOME/camcookie-download.sh",
-    "$HOME/camcookie-download.sh",
-
-    "echo '[Desktop Entry]' > $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Type=Application' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Name=Camcookie Themes' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Comment=Customize your Raspberry Pi with CUT themes, wallpapers, sounds, and system styling.' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Exec=$HOME/camcookie/control-center/launch.sh' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Icon=$HOME/camcookie/control-center/ui/icon.png' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Terminal=false' >> $HOME/.local/share/applications/camcookiethemes.desktop",
-    "echo 'Categories=Settings;Utility;' >> $HOME/.local/share/applications/camcookiethemes.desktop"
+    "$HOME/camcookie-download.sh"
   ],
-
   "uninstall": [
     "rm -rf $HOME/camcookie",
     "rm -f $HOME/.local/share/applications/camcookiethemes.desktop",
     "sed -i '/camcookie-import/d' ~/.bashrc",
     "sed -i '/camcookie-control/d' ~/.bashrc"
   ],
-
   "launch": "$HOME/camcookie/control-center/launch.sh",
   "version": "1.0",
   "files": [],
