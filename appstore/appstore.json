@@ -117,40 +117,41 @@
   "plugin": "NO"
 },
 {
-  "id": "camcookie-control-center",
-  "name": "Camcookie Control Center",
+  "id": "camcookiethemes",
+  "name": "Camcookie Themes",
   "creator": "Camcookie INC",
-  "description": "The full Camcookie Control Center for Raspberry Pi. Includes Appearance settings, Notifications, Themes, ThemeStore, Accessories, and full system customization. Supports CUT themes with images, sounds, videos, and 50+ customization options.",
-  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/camcookie-control.png",
-  "version": "1.0",
-  "plugin": "YES",
-  "themestore": "https://camcookie876.github.io/PI/camcookie_theme/themestore.json",
+  "description": "Camcookie Themes — Full CUT (Camcookie Ultra Theme) engine with ThemeStore support, theme importing, wallpapers, sounds, notification videos, icon packs, and complete system customization.",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/camcookie-themes.png",
 
   "install": [
-    "wget -O $HOME/camcookie-install.sh https://camcookie876.github.io/PI/camcookie_theme/camcookie-install.sh",
-    "chmod +x $HOME/camcookie-install.sh",
-    "$HOME/camcookie-install.sh"
+    "sudo apt update",
+    "sudo apt install -y python3 python3-pip omxplayer chromium-browser",
+
+    "wget -O $HOME/camcookie-download.sh https://camcookie876.github.io/PI/camcookie_theme/download/camcookie-download.sh",
+    "chmod +x $HOME/camcookie-download.sh",
+    "$HOME/camcookie-download.sh",
+
+    "echo '[Desktop Entry]' > $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Type=Application' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Name=Camcookie Themes' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Comment=Customize your Raspberry Pi with CUT themes, wallpapers, sounds, and system styling.' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Exec=$HOME/camcookie/control-center/launch.sh' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Icon=$HOME/camcookie/control-center/ui/icon.png' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Terminal=false' >> $HOME/.local/share/applications/camcookiethemes.desktop",
+    "echo 'Categories=Settings;Utility;' >> $HOME/.local/share/applications/camcookiethemes.desktop"
   ],
 
   "uninstall": [
-    "rm -rf $HOME/camcookie/control-center",
-    "rm -rf $HOME/camcookie/theme-engine",
-    "rm -rf $HOME/camcookie/theme-wallpapers",
-    "rm -rf $HOME/camcookie/theme-videos",
-    "rm -rf $HOME/camcookie/theme-sounds",
-    "rm -rf $HOME/camcookie/theme-icons",
-    "rm -rf $HOME/camcookie/themestore",
+    "rm -rf $HOME/camcookie",
+    "rm -f $HOME/.local/share/applications/camcookiethemes.desktop",
     "sed -i '/camcookie-import/d' ~/.bashrc",
     "sed -i '/camcookie-control/d' ~/.bashrc"
   ],
 
-  "launch": "bash $HOME/camcookie/control-center/launch.sh",
-
-  "files": [
-    "$HOME/camcookie/control-center",
-    "$HOME/camcookie/theme-engine",
-    "$HOME/camcookie/themestore"
-  ]
+  "launch": "$HOME/camcookie/control-center/launch.sh",
+  "version": "1.0",
+  "files": [],
+  "plugin": "NO"
 }
   ]
 }
