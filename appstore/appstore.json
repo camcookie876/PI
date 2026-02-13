@@ -135,6 +135,24 @@
   "version": "1.1",
   "files": [],
   "plugin": "NO"
+},
+{
+  "id": "camcookiechatpi",
+  "name": "Camcookie Chat (Pi)",
+  "creator": "Camcookie Connect 26",
+  "description": "Camcookie Chat app for Raspberry Pi.",
+  "icon": "https://camcookie876.github.io/PI/appstore/app/icons/chat.png",
+  "install": [
+    "curl -sSL https://camcookie876.github.io/PI/appstore/app/chat/install-chat.sh | bash"
+  ],
+  "uninstall": [
+    "rm -rf $HOME/camcookie-chat",
+    "rm -f $HOME/.local/share/applications/camcookie-chat.desktop"
+  ],
+  "launch": "bash $HOME/camcookie-chat/run-chat.sh",
+  "version": "1.0",
+  "files": [],
+  "plugin": "NO"
 }
   ]
 }
